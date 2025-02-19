@@ -4,7 +4,7 @@
 
 1. Clone this project
 ```
-git clone https://github.com/verma-kunal/AWS-Session.git
+git clone https://github.com/Aman-0308/Devops-project/tree/main/AWS-Project
 ```
 2. Setup the following environment variables - `(.env)` file
 ```
@@ -15,7 +15,16 @@ STATIC_DIR="./client"
 PUBLISHABLE_KEY=""
 SECRET_KEY=""
 ```
-3. Initialise and start the project
+3. Install the system dependencies via package manager for application
+   ```
+Ex: NPM (Node.js application) - Node package manager is used to install necessary packages mention in package.json file into node_modules
+Python: Pip, Java: Maven, PHP: composer, .Net: NuGet.
+Operating system- 
+apt: Used by Debian-based Linux distributions like Ubuntu.
+yum: Used by Red Hat-based Linux distributions like Fedora.
+```
+
+5. Initialise and start the project
 ```
 npm install
 npm run start
@@ -48,7 +57,7 @@ sudo apt update
 
 1. Clone this project in the remote VM
 ```
-git clone https://github.com/verma-kunal/AWS-Session.git
+git clone https://github.com/Aman-0308/Devops-project/tree/main/AWS-Project
 ```
 2. Setup the following environment variables - `(.env)` file
 ```
@@ -68,5 +77,8 @@ npm run start
 ```
 
 > NOTE - We will have to edit the **inbound rules** in the security group of our EC2, in order to allow traffic from our particular port
+
+Expose the port to accept traffic over internet. Add the inbound rule - TCP-3000 port
+Open in browser: EC2 public ip address : 3000
 
 ### Project is deployed on AWS 🎉
