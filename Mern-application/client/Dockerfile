@@ -15,7 +15,7 @@ RUN mv .env.example .env
 # Build the React app for production
 RUN npm run build
 
-# Stage 3: Final image to serve the app
+# Stage 3: Final image (Alpine- Lighter version (reduce image size) to serve the app
 FROM nginx:alpine AS final
 
 # The final stage takes the built static files from the build stage and copies them into the appropriate directory for Nginx to serve them.
