@@ -1,15 +1,15 @@
-# Stage 1: Install root dependencies
+# Stage 1: Build base 
 FROM node:16 AS build
 WORKDIR /app
 
-# Copy package.json and package-lock.json for root dependencies
+# Copy package.json and package-lock.json as dependencies
 COPY package*.json ./
 RUN npm install
 
 # Copy the rest of the client source code
 COPY . . 
 
-# Move environment file if needed
+# Move environment file
 RUN mv .env.example .env
 
 # Build the React app for production
