@@ -18,8 +18,12 @@ RUN npm run build
 # Stage 3: Final image to serve the app
 FROM nginx:alpine AS final
 
+# The final stage takes the built static files from the build stage and copies them into the appropriate directory for Nginx to serve them.
+
 # Copy the build artifacts from the build stage
 COPY --from=build /app/dist /usr/share/nginx/html
+
+# COPY --from=build /app/dist /usr/share/nginx/html copies the built files from the build container (the build stage) into Nginx’s default directory for serving HTML files (/usr/share/nginx/html).
 
 # Expose the port the app will run on
 EXPOSE 8080
