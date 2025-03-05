@@ -1,13 +1,10 @@
 pipeline {
-    agent 
+    agent any  // Defines that the pipeline will run on any available agent
     stages {
-        stage ("SCM checkout") {
+        stage("SCM checkout") {
             steps {
-                echo "Hello Aman"
+                echo "Hello Aman"  // Prints a message to the Jenkins console
             }
-
         }
-        
     }
-      
 }
