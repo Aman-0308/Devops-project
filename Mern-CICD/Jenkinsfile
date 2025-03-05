@@ -36,7 +36,9 @@ pipeline {
 
         stage("Push images to Docker registry") {
             steps {
-                // Login to Docker Registry using Jenkins credentials
+                stage("Login into Docker registry") {
+                    steps {
+                        // Login to Docker Registry using Jenkins credentials
                         echo "Logging into Docker Hub"
                         withCredentials([usernamePassword(
                             credentialsId: 'Dockerhub', 
@@ -56,6 +58,8 @@ pipeline {
                         }
                     }
                 }
+            }
+        }
 
         stage("Deploy") {
             steps {
