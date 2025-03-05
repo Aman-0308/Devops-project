@@ -1,9 +1,70 @@
 pipeline {
-    agent any  // Defines that the pipeline will run on any available agent
+    agent any  // Specifying the agent where the pipeline will run
+
+    environment {
+        Git_URL = 'https://github.com/Aman-0308/Devops-project.git'  // Corrected the syntax for Git URL
+        Docker_credentials = 'Dockerhub'  // Corrected environment variable
+    }
+
     stages {
         stage("SCM checkout") {
             steps {
-                echo "Hello Aman"  // Prints a message to the Jenkins console
+                echo "Cloning the git repo"
+                sh "git clone ${env.Git_URL}"  // Corrected the syntax to reference environment variable
+                echo "Git cloned successfully"
+            }
+        }
+
+        stage("Build") {
+            parallel {
+                stage("Build frontend") {
+                    steps {
+                        sh "cd Mern-CICD/mern/frontend"
+                        sh "docker build -t mern-frontend:V1 ."
+                        echo "Frontend Docker build successful"
+                    }
+                }
+                stage("Build Backend") {
+                    steps {
+                        sh "cd Mern-CICD/mern/backend"
+                        sh "docker build -t mern-backend:V1 ."
+                        echo "Backend Docker build successful"
+                    }
+                }
+            }
+        }
+
+        stage("Push images to Docker registry") {
+            steps {
+                stage("Login into Docker registry") {
+                    steps {
+                        // Login to Docker Registry using Jenkins credentials
+                        echo "Logging into Docker Hub"
+                        withCredentials([usernamePassword(
+                            credentialsId: 'Dockerhub', 
+                            passwordVariable: 'Dockerhub-pass', 
+                            usernameVariable: 'Dockerhub-user')]) {
+                            sh "docker login -u ${env.Dockerhub-user} -p ${env.Dockerhub-pass}"
+
+                            // Pushing Frontend image
+                            sh "docker tag mern-frontend:V1 ${env.Dockerhub-user}/mern-frontend:V1"
+                            sh "docker push ${env.Dockerhub-user}/mern-frontend:V1"
+                            echo "Frontend image pushed successfully"
+
+                            // Pushing Backend image
+                            sh "docker tag mern-backend:V1 ${env.Dockerhub-user}/mern-backend:V1"
+                            sh "docker push ${env.Dockerhub-user}/mern-backend:V1"
+                            echo "Backend image pushed successfully"
+                        }
+                    }
+                }
+            }
+        }
+
+        stage("Deploy") {
+            steps {
+                echo "Deploying"
+                // Add your deployment steps here (e.g., SSH into a server, Docker run, etc.)
             }
         }
     }
