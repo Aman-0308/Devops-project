@@ -2,47 +2,64 @@ pipeline {
     agent any  // Specifying the agent where the pipeline will run
 
     environment {
-        Git_URL = 'https://github.com/Aman-0308/Devops-project.git'  // Corrected the syntax for Git URL
-        Docker_credentials = 'Dockerhub'  // Corrected environment variable
+        Git_URL = 'https://github.com/Aman-0308/Devops-project.git'  // Git URL
     }
 
     stages {
+        stage("Checkout SCM") {
+            steps {
+                echo "Cloning Git repo"
+                checkout scm
+                echo "Git clone successful"
+            }
+        }
+
         stage("Build") {
             parallel {
-                stage("Build frontend") {
+                stage("Build Frontend") {
                     steps {
-                        sh "docker build -t mern-frontend:V1 ./Mern-CICD/mern/frontend"
+                        echo "Building Frontend Docker Image"
+                        sh """
+                            cd Mern-CICD/mern/frontend
+                            docker build -t mern-frontend:V1 .
+                        """
                         echo "Frontend Docker build successful"
                     }
                 }
                 stage("Build Backend") {
                     steps {
-                        sh "docker build -t mern-backend:V1 ./Mern-CICD/mern/backend"
+                        echo "Building Backend Docker Image"
+                        sh """
+                            cd Mern-CICD/mern/backend
+                            docker build -t mern-backend:V1 .
+                        """
                         echo "Backend Docker build successful"
                     }
                 }
             }
         }
 
-        stage("Push images to Docker registry") {
+        stage("Push Images to Docker Hub") {
             steps {
-                // Login to Docker Registry using Jenkins credentials
                 echo "Logging into Docker Hub"
-                withCredentials([usernamePassword(
-                    credentialsId: 'Dockerhub', 
-                    passwordVariable: 'Dockerhub-pass', 
-                    usernameVariable: 'Dockerhub-user')]) {
-                    sh "docker login -u $Dockerhub-user -p $Dockerhub-pass"
+                withCredentials([usernamePassword(credentialsId: 'Dockerhub', passwordVariable: 'DOCKERHUB_PASS', usernameVariable: 'DOCKERHUB_USER')]) {
+                    // Use env to explicitly reference variables in shell commands
+                    echo "Docker login to Docker Hub"
+                    sh """
+                        docker login -u ${env.DOCKERHUB_USER} -p ${env.DOCKERHUB_PASS}
+                    """
 
-                    // Pushing Frontend image
-                    sh "docker tag mern-frontend:V1 $Dockerhub-user/mern-frontend:V1"
-                    sh "docker push $Dockerhub-user/mern-frontend:V1"
-                    echo "Frontend image pushed successfully"
+                    echo "Pushing Frontend Docker image"
+                    sh """
+                        docker tag mern-frontend:V1 ${env.DOCKERHUB_USER}/mern-frontend:V1
+                        docker push ${env.DOCKERHUB_USER}/mern-frontend:V1
+                    """
 
-                    // Pushing Backend image
-                    sh "docker tag mern-backend:V1 $Dockerhub-user/mern-backend:V1"
-                    sh "docker push $Dockerhub-user/mern-backend:V1"
-                    echo "Backend image pushed successfully"
+                    echo "Pushing Backend Docker image"
+                    sh """
+                        docker tag mern-backend:V1 ${env.DOCKERHUB_USER}/mern-backend:V1
+                        docker push ${env.DOCKERHUB_USER}/mern-backend:V1
+                    """
                 }
             }
         }
