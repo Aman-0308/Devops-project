@@ -20,14 +20,14 @@ pipeline {
                 stage("Build frontend") {
                     steps {
                         sh "cd Mern-CICD/mern/frontend"
-                        sh "docker build -t mern-frontend:V1 ."
+                        sh "docker build -t mern-frontend:V1 ./Mern-CICD/mern/frontend"
                         echo "Frontend Docker build successful"
                     }
                 }
                 stage("Build Backend") {
                     steps {
                         sh "cd Mern-CICD/mern/backend"
-                        sh "docker build -t mern-backend:V1 ."
+                        sh "docker build -t mern-backend:V1 ./Mern-CICD/mern/backend"
                         echo "Backend Docker build successful"
                     }
                 }
