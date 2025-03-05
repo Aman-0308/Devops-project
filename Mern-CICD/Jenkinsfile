@@ -2,7 +2,7 @@ pipeline {
     agent any  // Specifying the agent where the pipeline will run
 
     environment {
-        Git_URL = 'https://github.com/Aman-0308/Devops-project.git'  // Git URL
+        Git_URL = 'https://github.com/Aman-0308/Devops-project.git'  // Storing Git url to ennviroment variable
     }
 
     stages {
@@ -44,6 +44,7 @@ pipeline {
                 echo "Logging into Docker Hub"
                 withCredentials([usernamePassword(credentialsId: 'Dockerhub', passwordVariable: 'DOCKERHUB_PASS', usernameVariable: 'DOCKERHUB_USER')]) {
                     // Use env to explicitly reference variables in shell commands
+                    // Dockerhub credentials needs to be added as global variable under manage jenkins --> crendetails >> add global variable.
                     echo "Docker login to Docker Hub"
                     sh """
                         docker login -u ${env.DOCKERHUB_USER} -p ${env.DOCKERHUB_PASS}
@@ -51,13 +52,13 @@ pipeline {
 
                     echo "Pushing Frontend Docker image"
                     sh """
-                        docker tag mern-frontend:V1 ${env.DOCKERHUB_USER}/mern-frontend:V1
+                        docker tag mern-frontend:V1 ${env.DOCKERHUB_USER}/mern-frontend:V1  // Image has to be tag to dockerhub
                         docker push ${env.DOCKERHUB_USER}/mern-frontend:V1
                     """
 
                     echo "Pushing Backend Docker image"
                     sh """
-                        docker tag mern-backend:V1 ${env.DOCKERHUB_USER}/mern-backend:V1
+                        docker tag mern-backend:V1 ${env.DOCKERHUB_USER}/mern-backend:V1  // Image has to be tag to dockerhub
                         docker push ${env.DOCKERHUB_USER}/mern-backend:V1
                     """
                 }
