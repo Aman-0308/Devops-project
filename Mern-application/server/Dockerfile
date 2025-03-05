@@ -1,4 +1,4 @@
-# Stage 1: Build backend image
+# Stage 1: Build backend (Buster-slim image to reduce image size)
 FROM node:16.20.2-buster-slim AS build
 
 # Set the working directory inside the container
