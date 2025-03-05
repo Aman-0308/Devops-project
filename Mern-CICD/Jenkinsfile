@@ -42,7 +42,7 @@ pipeline {
                             credentialsId: 'Dockerhub', 
                             passwordVariable: 'Dockerhub-pass', 
                             usernameVariable: 'Dockerhub-user')]) {
-                            sh "docker login -u ${env.Dockerhub-user} -p ${env.Dockerhub-pass}"
+                            sh "docker login -u $Dockerhub-user -p $Dockerhub-pass
 
                             // Pushing Frontend image
                             sh "docker tag mern-frontend:V1 ${env.Dockerhub-user}/mern-frontend:V1"
