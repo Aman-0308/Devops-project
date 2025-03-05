@@ -7,13 +7,13 @@ pipeline {
     }
 
     stages {
-        stage("SCM checkout") {
-            steps {
-                echo "Cloning the git repo"
-                sh "git clone ${env.Git_URL}"  // Corrected the syntax to reference environment variable
-                echo "Git cloned successfully"
-            }
-        }
+        // stage("SCM checkout") {
+        //     steps {
+        //         echo "Cloning the git repo"
+        //         sh "git clone ${env.Git_URL}"  // Corrected the syntax to reference environment variable
+        //         echo "Git cloned successfully"
+        //     }
+        // }
 
         stage("Build") {
             parallel {
@@ -27,7 +27,7 @@ pipeline {
                 stage("Build Backend") {
                     steps {
                         sh "cd Mern-CICD/mern/backend"
-                        sh "docker build -t mern-backend:V1 ./Mern-CICD/mern/backend"
+                        sh "docker build -t mern-backend:V1 ./Mern-CICD/mern/"
                         echo "Backend Docker build successful"
                     }
                 }
