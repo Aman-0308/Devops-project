@@ -7,26 +7,16 @@ pipeline {
     }
 
     stages {
-        // stage("SCM checkout") {
-        //     steps {
-        //         echo "Cloning the git repo"
-        //         sh "git clone ${env.Git_URL}"  // Corrected the syntax to reference environment variable
-        //         echo "Git cloned successfully"
-        //     }
-        // }
-
         stage("Build") {
             parallel {
                 stage("Build frontend") {
                     steps {
-                        sh "cd Mern-CICD/mern/frontend"
                         sh "docker build -t mern-frontend:V1 ./Mern-CICD/mern/frontend"
                         echo "Frontend Docker build successful"
                     }
                 }
                 stage("Build Backend") {
                     steps {
-                        sh "cd Mern-CICD/mern/backend"
                         sh "docker build -t mern-backend:V1 ./Mern-CICD/mern/backend"
                         echo "Backend Docker build successful"
                     }
@@ -36,27 +26,26 @@ pipeline {
 
         stage("Push images to Docker registry") {
             steps {
-                        // Login to Docker Registry using Jenkins credentials
-                        echo "Logging into Docker Hub"
-                        withCredentials([usernamePassword(
-                            credentialsId: 'Dockerhub', 
-                            passwordVariable: 'Dockerhub-pass', 
-                            usernameVariable: 'Dockerhub-user')]) {
-                            sh "docker login -u $Dockerhub-user -p $Dockerhub-pass"
+                // Login to Docker Registry using Jenkins credentials
+                echo "Logging into Docker Hub"
+                withCredentials([usernamePassword(
+                    credentialsId: 'Dockerhub', 
+                    passwordVariable: 'Dockerhub-pass', 
+                    usernameVariable: 'Dockerhub-user')]) {
+                    sh "docker login -u $Dockerhub-user -p $Dockerhub-pass"
 
-                            // Pushing Frontend image
-                            sh "docker tag mern-frontend:V1 ${env.Dockerhub-user}/mern-frontend:V1"
-                            sh "docker push ${env.Dockerhub-user}/mern-frontend:V1"
-                            echo "Frontend image pushed successfully"
+                    // Pushing Frontend image
+                    sh "docker tag mern-frontend:V1 $Dockerhub-user/mern-frontend:V1"
+                    sh "docker push $Dockerhub-user/mern-frontend:V1"
+                    echo "Frontend image pushed successfully"
 
-                            // Pushing Backend image
-                            sh "docker tag mern-backend:V1 ${env.Dockerhub-user}/mern-backend:V1"
-                            sh "docker push ${env.Dockerhub-user}/mern-backend:V1"
-                            echo "Backend image pushed successfully"
-                        }
-                    }
+                    // Pushing Backend image
+                    sh "docker tag mern-backend:V1 $Dockerhub-user/mern-backend:V1"
+                    sh "docker push $Dockerhub-user/mern-backend:V1"
+                    echo "Backend image pushed successfully"
                 }
-
+            }
+        }
         stage("Deploy") {
             steps {
                 echo "Deploying"
@@ -65,3 +54,4 @@ pipeline {
         }
     }
 }
+
