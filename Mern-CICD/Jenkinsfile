@@ -76,12 +76,12 @@ pipeline {
                     ssh -T -i /mnt/c/Users/rahul/downloads/demo1.pem ubuntu@16.170.237.234
 
                     # Pulling frontend and backend images from Docker Hub  
-                    docker pull ${env.DOCKERHUB_USER}/mern-backend:V1
-                    docker pull ${env.DOCKERHUB_USER}/mern-frontend:V1  
+                    docker pull amanahuja03/mern-backend:V1
+                    docker pull amanahuja03/mern-frontend:V1  
                
                     # Pulling frontend and backend images from Docker Hub  
-                    docker run -d -p 5050:5050 ${env.DOCKERHUB_USER}/mern-frontend:V1
-                    docker run -d -p 5173:5173 ${env.DOCKERHUB_USER}/mern-backend:v1
+                    docker run -d -p 5050:5050 amanahuja03/mern-frontend:V1
+                    docker run -d -p 5173:5173 amanahuja03/mern-backend:v1
 
                 """
                 echo "deployment completed sucessfully"
