@@ -54,14 +54,16 @@ pipeline {
 
                     echo "Pushing Frontend Docker image"
                     sh """
-                        docker tag mern-frontend:V1 ${env.DOCKERHUB_USER}/mern-frontend:V1  // Image has to be tag to dockerhub
-                        docker push ${env.DOCKERHUB_USER}/mern-frontend:V1
+                        # Image has to be tag to dockerhub
+                        docker tag mern-frontend:V1 ${env.DOCKERHUB_USER}/mern-frontend:V1  
+                        docker tag mern-backend:V1 ${env.DOCKERHUB_USER}/mern-backend:V1 
                     """
 
                     echo "Pushing Backend Docker image"
                     sh """
-                        docker tag mern-backend:V1 ${env.DOCKERHUB_USER}/mern-backend:V1  // Image has to be tag to dockerhub
+                        # Image has to be pushed to dockerhub
                         docker push ${env.DOCKERHUB_USER}/mern-backend:V1
+                        docker push ${env.DOCKERHUB_USER}/mern-frontend:V1
                     """
                 }
             }
