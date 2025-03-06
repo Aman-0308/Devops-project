@@ -81,7 +81,7 @@ pipeline {
                
                     # Pulling frontend and backend images from Docker Hub  
                     docker run -d -p 5050:5050 amanahuja03/mern-frontend:V1
-                    docker run -d -p 5173:5173 amanahuja03/mern-backend:v1
+                    docker run -d -p 5173:5173 amanahuja03/mern-backend:V1
 
                 """
                 echo "deployment completed sucessfully"
