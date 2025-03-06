@@ -29,7 +29,7 @@ pipeline {
                 stage("Build Backend") {
                     steps {
                         sh "cd Mern-CICD/mern/backend"
-                        sh "docker build -t mern-backend:V1 ./Mern-CICD/mern/"
+                        sh "docker build -t mern-backend:V1 ."
                         echo "Backend Docker build successful"
                     }
                 }
