@@ -28,9 +28,14 @@ pipeline {
                 }
                 stage("Build Backend") {
                     steps {
-                        sh "cd Mern-CICD/mern/backend"
-                        sh "docker build -t mern-backend:V1 ."
-                        echo "Backend Docker build successful"
+                        echo "Building backend Docker Image"
+                        sh """
+                            cd Mern-CICD/mern/backend
+                            docker build -t mern-backend:V1 .
+
+                         """
+                         echo "Backend Docker build successful"
+
                     }
                 }
             }
