@@ -73,10 +73,10 @@ pipeline {
                 echo "Deploying"
                 sh """
                     # SSH into the remote server
-                    ssh -i /mnt/c/Users/rahul/downloads/demo1.pem ubuntu@16.170.237.234
+                    ssh -T -i /mnt/c/Users/rahul/downloads/demo1.pem ubuntu@16.170.237.234
 
                     # Pulling frontend and backend images from Docker Hub  
-                    docker pull ${env.DOCKERHUB_USER}/mern-frontend:V1  
+                    docker pull ${env.DOCKERHUB_USER}/mern-backend:V1
                     docker pull ${env.DOCKERHUB_USER}/mern-frontend:V1  
                
                     # Pulling frontend and backend images from Docker Hub  
