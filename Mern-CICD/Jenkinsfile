@@ -67,12 +67,12 @@ pipeline {
             steps {
                 echo "Deploying"
                 sh """
-                    ssh -T -i /mnt/c/Users/rahul/downloads/demo1.pem ubuntu@13.60.245.165 << 'EOF'
+                    ssh -T -i /mnt/c/Users/rahul/downloads/demo1.pem ubuntu@13.60.245.165 bash -c '
                         docker pull amanahuja03/mern-backend:V1
                         docker pull amanahuja03/mern-frontend:V1
                         docker run -d -p 5051:5050 amanahuja03/mern-frontend:V1
                         docker run -d -p 5173:5173 amanahuja03/mern-backend:V1
-                    EOF
+                    '
                 """
                 echo "Deployment completed successfully"
             }
