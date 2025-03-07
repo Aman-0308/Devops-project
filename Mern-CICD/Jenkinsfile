@@ -2,7 +2,7 @@ pipeline {
     agent any  // Specifying the agent where the pipeline will run
 
     environment {
-        Git_URL = 'https://github.com/Aman-0308/Devops-project.git'  // Storing Git url to ennviroment variable
+        Git_URL = 'https://github.com/Aman-0308/Devops-project.git'  // Storing Git url to environment variable
     }
 
     stages {
@@ -32,10 +32,8 @@ pipeline {
                         sh """
                             cd Mern-CICD/mern/backend
                             docker build -t mern-backend:V1 .
-
-                         """
-                         echo "Backend Docker build successful"
-
+                        """
+                        echo "Backend Docker build successful"
                     }
                 }
             }
@@ -45,8 +43,6 @@ pipeline {
             steps {
                 echo "Logging into Docker Hub"
                 withCredentials([usernamePassword(credentialsId: 'Dockerhub', passwordVariable: 'DOCKERHUB_PASS', usernameVariable: 'DOCKERHUB_USER')]) {
-                    // Use env to explicitly reference variables in shell commands
-                    // Dockerhub credentials needs to be added as global variable under manage jenkins --> crendetails >> add global variable.
                     echo "Docker login to Docker Hub"
                     sh """
                         docker login -u ${env.DOCKERHUB_USER} -p ${env.DOCKERHUB_PASS}
@@ -54,37 +50,32 @@ pipeline {
 
                     echo "Pushing Frontend Docker image"
                     sh """
-                        # Image has to be tag to dockerhub
-                        docker tag mern-frontend:V1 ${env.DOCKERHUB_USER}/mern-frontend:V1  
-                        docker tag mern-backend:V1 ${env.DOCKERHUB_USER}/mern-backend:V1 
+                        docker tag mern-frontend:V1 ${env.DOCKERHUB_USER}/mern-frontend:V1
+                        docker tag mern-backend:V1 ${env.DOCKERHUB_USER}/mern-backend:V1
                     """
 
                     echo "Pushing Backend Docker image"
                     sh """
-                        # Image has to be pushed to dockerhub
                         docker push ${env.DOCKERHUB_USER}/mern-backend:V1
                         docker push ${env.DOCKERHUB_USER}/mern-frontend:V1
                     """
                 }
             }
         }
+
         stage("Deploy") {
             steps {
                 echo "Deploying"
                 sh """
                     ssh -T -i /mnt/c/Users/rahul/downloads/demo1.pem ubuntu@13.60.245.165 << 'EOF'
-                        # Pulling frontend and backend images from Docker Hub  
-                          docker pull amanahuja03/mern-backend:V1
-                          docker pull amanahuja03/mern-frontend:V1  
-
-                        # Running the Docker containers
-                          docker run -d -p 5051:5050 amanahuja03/mern-frontend:V1
-                          docker run -d -p 5173:5173 amanahuja03/mern-backend:V1
+                        docker pull amanahuja03/mern-backend:V1
+                        docker pull amanahuja03/mern-frontend:V1
+                        docker run -d -p 5051:5050 amanahuja03/mern-frontend:V1
+                        docker run -d -p 5173:5173 amanahuja03/mern-backend:V1
                     EOF
-
-                echo "deployment completed sucessfully"
-                }
+                """
+                echo "Deployment completed successfully"
+            }
         }
     }
 }
-
