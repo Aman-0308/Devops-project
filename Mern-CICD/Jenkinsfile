@@ -1,12 +1,14 @@
+#This Jenkins pipeline automates the process of building, pushing Docker images, and deploying them on a remote server
+
 pipeline {
     agent any  // Specifying the agent where the pipeline will run
 
     environment {
-        Git_URL = 'https://github.com/Aman-0308/Devops-project.git'  // Storing Git url to environment variable
+        Git_URL = 'https://github.com/Aman-0308/Devops-project.git'  // Environment Variables- Storing Git url to environment variable
     }
 
     stages {
-        stage("Checkout SCM") {
+        stage("Checkout SCM") {                                     // This stage is checking/cloning the git REPO mentioned in SCM of the pipeline
             steps {
                 echo "Cloning Git repo"
                 checkout scm
@@ -14,8 +16,8 @@ pipeline {
             }
         }
 
-        stage("Build") {
-            parallel {
+        stage("Build") {                                             // This stage is paralleling building the fronted & backend: Using docker build command to build both frontend & backend from each dockerfile.
+            parallel {                                              
                 stage("Build Frontend") {
                     steps {
                         echo "Building Frontend Docker Image"
@@ -39,7 +41,7 @@ pipeline {
             }
         }
 
-        stage("Push Images to Docker Hub") {
+        stage("Push Images to Docker Hub") {              // Docker Hub Login: It uses the withCredentials block to securely access Docker Hub credentials from Jenkins' credential store (via credentialsId: 'Dockerhub'). The credentials are stored in the DOCKERHUB_USER and DOCKERHUB_PASS environment variables.
             steps {
                 echo "Logging into Docker Hub"
                 withCredentials([usernamePassword(credentialsId: 'Dockerhub', passwordVariable: 'DOCKERHUB_PASS', usernameVariable: 'DOCKERHUB_USER')]) {
@@ -50,13 +52,13 @@ pipeline {
 
                     echo "Pushing Frontend Docker image"
                     sh """
-                        docker tag mern-frontend:V1 ${env.DOCKERHUB_USER}/mern-frontend:V1
+                        docker tag mern-frontend:V1 ${env.DOCKERHUB_USER}/mern-frontend:V1    //After login, it tags the locally built images (mern-frontend:V1 and mern-backend:V1) with the Docker Hub repository names, like ${env.DOCKERHUB_USER}/mern-frontend:V1 and ${env.DOCKERHUB_USER}/mern-backend:V1.
                         docker tag mern-backend:V1 ${env.DOCKERHUB_USER}/mern-backend:V1
                     """
 
                     echo "Pushing Backend Docker image"
                     sh """
-                        docker push ${env.DOCKERHUB_USER}/mern-backend:V1
+                        docker push ${env.DOCKERHUB_USER}/mern-backend:V1            //Pushing: After tagging, the Docker images are pushed to the Docker Hub repository using the docker push command
                         docker push ${env.DOCKERHUB_USER}/mern-frontend:V1
                     """
                 }
@@ -67,12 +69,12 @@ pipeline {
             steps {
                 echo "Deploying"
                 sh """
-                    ssh -T -i /mnt/c/Users/rahul/downloads/demo1.pem ubuntu@13.60.245.165 bash -c '
-                        docker pull amanahuja03/mern-backend:V1
+                    ssh -T -i /mnt/c/Users/rahul/downloads/demo1.pem ubuntu@13.60.245.165 bash -c '     // SSH into Remote Server: It uses SSH to connect to the remote server (ubuntu@13.60.245.165) using the SSH key stored at /mnt/c/Users/rahul/downloads/demo1.pem. With bash -c, you can group multiple commands together and ensure they execute in sequence on the remote server, all from a single SSH connection.
+                        docker pull amanahuja03/mern-backend:V1                                         // Once connected to the server, it pulls the frontend and backend images from Docker Hub (docker pull amanahuja03/mern-backend:V1 and docker pull amanahuja03/mern-frontend:V1).
                         docker pull amanahuja03/mern-frontend:V1
-                        docker run -d -p 5051:5173 amanahuja03/mern-frontend:V1;
-                        docker run -d -p 5173:5173 amanahuja03/mern-backend:V1
-                    '
+                        docker run -d -p 5051:5173 amanahuja03/mern-frontend:V1;                        // After pulling the images, it runs the frontend container and the backend container using docker run. It maps the appropriate ports as follows:
+                        docker run -d -p 5173:5173 amanahuja03/mern-backend:V1                          // Frontend: docker run -d -p 5051:5173 amanahuja03/mern-frontend:V1 maps the host's port 5051 to the container's port 5173.
+                    '                                                                                   // Backend: docker run -d -p 5173:5173 amanahuja03/mern-backend:V1 maps the host's port 5173 to the container's port 5173.
                 """
                 echo "Deployment completed successfully"
             }
