@@ -4,7 +4,7 @@
 ```bash
 #!/bin/bash
 
-## 2. Setting Variables
+**2. Setting Variables**
 
 API_URL="https://api.github.com"
 USERNAME="$USERNAME"
