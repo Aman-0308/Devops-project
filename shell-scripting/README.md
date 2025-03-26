@@ -1,7 +1,6 @@
 1. Shebang Line:#!/bin/bash
 
-
- This is the **shebang**
+This is the **shebang**
      line, which specifies that the script should be executed using the **Bash**
      shell.
 
