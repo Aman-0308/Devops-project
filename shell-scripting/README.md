@@ -1,93 +1,52 @@
-1. Shebang Line: `#!/bin/bash`
+# Shell Scripting
 
-   This is the **shebang** line, which specifies that the script should be executed using the **Bash** shell.
+## 1. Shebang Line
+```bash
+#!/bin/bash
 
-2. Setting Variables:
+2. Setting Variables
 
-   ```bash
-   API_URL="https://api.github.com"
-   USERNAME="$USERNAME"
-   TOKEN="$TOKEN"
-   REPO_OWNER="$1"
-   REPO_NAME="$2"
+API_URL="https://api.github.com"
+USERNAME="$USERNAME"
+TOKEN="$TOKEN"
+REPO_OWNER="$1"
+REPO_NAME="$2"
 
-
- API_URL: This variable stores the
-     base URL for GitHub's API (https://api.github.com).
- USERNAME and TOKEN: These are environment
-     variables that are set externally (i.e., you must have set USERNAME and TOKEN in your environment before
-     running the script).
- REPO_OWNER and REPO_NAME: These variables capture
-     the command-line arguments passed to the script when it's executed. $1 represents the first
-     argument (REPO_OWNER), and $2 represents the second
-     argument (REPO_NAME).
+API_URL: This variable stores the base URL for GitHub's API (https://api.github.com).
+USERNAME and TOKEN: These are environment variables that are set externally (i.e., you must have set USERNAME and TOKEN in your environment before running the script).
+REPO_OWNER and REPO_NAME: These variables capture the command-line arguments passed to the script when it's executed. $1 represents the first argument (REPO_OWNER), and $2 represents the second argument (REPO_NAME).
 
 
 3. Checking for Required Credentials:
 
-if [[ -z "$USERNAME" || -z "$TOKEN"
-]]; then
-
-&nbsp; echo "Error:
-GitHub USERNAME or TOKEN environment variables are not set."
-
-&nbsp; exit 1
-
+if [[ -z "$USERNAME" || -z "$TOKEN" ]]; then
+    echo "Error: GitHub USERNAME or TOKEN environment variables are not set."
+    exit 1
 fi
 
-
- This checks if the USERNAME or TOKEN environment variables are **empty**
-     (using -z to test if the variable is
-     null).
- 
-  If either USERNAME or TOKEN is not set, the script
-      prints an error message and exits with a non-zero exit status (exit 1).
-  If both credentials are
-      set, the script continues executing.
+This checks if the USERNAME or TOKEN environment variables are empty (using -z to test if the variable is null). If either USERNAME or TOKEN is not set, the script prints an error message and exits with a non-zero exit status (exit 1). If both credentials are set, the script continues executing.
  
 
-
-4. Defining the Function github_api_get:
+4. Defining the Function github_api_get
 
 function github_api_get {
-
-&nbsp;&nbsp;&nbsp; local
-endpoint="$1"
-
-&nbsp;&nbsp;&nbsp; local
-url="${API_URL}/${endpoint}"
-
-&nbsp;
-
-&nbsp;&nbsp;&nbsp; # Send a
-GET request to the GitHub API with authentication
-
-&nbsp;&nbsp;&nbsp;
-response=$(curl -s -u "${USERNAME}:${TOKEN}" "$url")
-
+    local endpoint="$1"
+    local url="${API_URL}/${endpoint}"
+    
+    # Send a GET request to the GitHub API with authentication
+    response=$(curl -s -u "${USERNAME}:${TOKEN}" "$url")
 }
 
+This function is defined to make a GET request to the GitHub API.
 
- This function is defined to
-     make a **GET request** to the GitHub API.
- Parameters:
- 
-  endpoint is passed as a parameter ($1) when calling the
-      function. It specifies which part of the GitHub API to query.
-  url combines the API_URL with the endpoint to create the full URL for
-      the API request.
- 
- Action:
- 
-  It uses curl to send an HTTP GET
-      request to the GitHub API.
-  The -s option tells curl to run silently (no
-      progress bar).
-  The -u
-      "${USERNAME}:${TOKEN}" option passes the USERNAME and TOKEN for basic
-      authentication.
-  The result of the curl request (GitHub API
-      response) is stored in the variable response.
+Parameters:
+endpoint is passed as a parameter ($1) when calling the function. It specifies which part of the GitHub API to query.
+url combines the API_URL with the endpoint to create the full URL for the API request.
+Action:
+It uses curl to send an HTTP GET request to the GitHub API.
+The -s option tells curl to run silently (no progress bar).
+The -u "${USERNAME}:${TOKEN}" option passes the USERNAME and TOKEN for basic authentication.
+The result of the curl request (GitHub API response) is stored in the variable response.
  
 
 
