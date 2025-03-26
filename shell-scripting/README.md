@@ -1,114 +1,73 @@
-Script Breakdown and Detailed Explanation:
-1. Shebang Line:
-bash
+**1. Shebang Line:**
 #!/bin/bash
-•	Purpose: Specifies the script should be run using the Bash shell.
-2. Defining Constants and Variables:
-bash
-# GitHub API URL
+•	This is the shebang line, which specifies that the script should be executed using the Bash shell.
+**2. Setting Variables:**
 API_URL="https://api.github.com"
-•	Purpose: Sets the base URL for GitHub's API endpoints.
-bash
-# GitHub username and personal access token
-USERNAME=$username
-TOKEN=$token
-•	Purpose: Sets the USERNAME and TOKEN variables with values from previously defined environment variables. Note: This is only valid if $username and $token are set in the environment or passed from another source.
-3. Command-Line Arguments:
-bash
-# User and Repository information
-REPO_OWNER=$1
-REPO_NAME=$2
-Purpose: Assigns the first and second command-line arguments to REPO_OWNER and REPO_NAME.
-Usage: This allows you to specify the repository owner and repository name when you run the script.
-Example Usage: ./script_name.sh owner_name repository_name
-4. Defining the github_api_get Function:
-bash
+USERNAME="$USERNAME"
+TOKEN="$TOKEN"
+REPO_OWNER="$1"
+REPO_NAME="$2"
+•	API_URL: This variable stores the base URL for GitHub's API (https://api.github.com).
+•	USERNAME and TOKEN: These are environment variables that are set externally (i.e., you must have set USERNAME and TOKEN in your environment before running the script).
+•	REPO_OWNER and REPO_NAME: These variables capture the command-line arguments passed to the script when it's executed. $1 represents the first argument (REPO_OWNER), and $2 represents the second argument (REPO_NAME).
+**3. Checking for Required Credentials:**
+if [[ -z "$USERNAME" || -z "$TOKEN" ]]; then
+  echo "Error: GitHub USERNAME or TOKEN environment variables are not set."
+  exit 1
+fi
+•	This checks if the USERNAME or TOKEN environment variables are empty (using -z to test if the variable is null).
+o	If either USERNAME or TOKEN is not set, the script prints an error message and exits with a non-zero exit status (exit 1).
+o	If both credentials are set, the script continues executing.
+**4. Defining the Function github_api_get:**
 function github_api_get {
     local endpoint="$1"
     local url="${API_URL}/${endpoint}"
 
     # Send a GET request to the GitHub API with authentication
-    curl -s -u "${USERNAME}:${TOKEN}" "$url"
+    response=$(curl -s -u "${USERNAME}:${TOKEN}" "$url")
 }
-Purpose: Defines a function named github_api_get to make authenticated GET requests to the GitHub API.
-Parameters:
-endpoint: The specific API endpoint to request.
-Function Body:
-Constructs the full URL by appending the endpoint to the base API URL.
-Uses curl to send a GET request with silent mode (-s) and basic authentication (-u "${USERNAME}:${TOKEN}").
-5. Defining the list_users_with_read_access Function:
-bash
+•	This function is defined to make a GET request to the GitHub API.
+**•	Parameters:**
+o	endpoint is passed as a parameter ($1) when calling the function. It specifies which part of the GitHub API to query.
+o	url combines the API_URL with the endpoint to create the full URL for the API request.
+**•	Action:**
+o	It uses curl to send an HTTP GET request to the GitHub API.
+o	The -s option tells curl to run silently (no progress bar).
+o	The -u "${USERNAME}:${TOKEN}" option passes the USERNAME and TOKEN for basic authentication.
+o	The result of the curl request (GitHub API response) is stored in the variable response.
+**5. Defining the Function list_users_with_read_access:**
 function list_users_with_read_access {
     local endpoint="repos/${REPO_OWNER}/${REPO_NAME}/collaborators"
 
     # Fetch the list of collaborators on the repository
-    collaborators="$(github_api_get "$endpoint" | jq -r '.[] | select(.permissions.pull == true) | .login')"
+    collaborators=$(github_api_get "$endpoint" | jq -r '.[] | select(.permissions.pull == true) | .login')
 
-    # Display the list of collaborators with read access
+    # Display the list of collaborators
     if [[ -z "$collaborators" ]]; then
-        echo "No users with read access found for ${REPO_OWNER}/${REPO_NAME}."
+        echo "No collaborators found for ${REPO_OWNER}/${REPO_NAME}."
     else
-        echo "Users with read access to ${REPO_OWNER}/${REPO_NAME}:"
+        echo "Collaborators for ${REPO_OWNER}/${REPO_NAME}:"
         echo "$collaborators"
     fi
 }
-Purpose: Defines a function named list_users_with_read_access to list users with read access to a specified repository.
-Function Body:
-•	Constructs the endpoint URL for fetching collaborators.
-•	Calls the github_api_get function to fetch data from the GitHub API.
-•	Pipes the JSON response to jq for processing:
-•	.[]: Iterates over each item in the JSON array.
-•	select(.permissions.pull == true): Filters items where the user has read (pull) permission.
-•	.login: Extracts the username (login) field from the filtered items.
-•	Stores the resulting usernames in the collaborators variable.
-•	Checks if any collaborators were found and prints the appropriate message.
+•	This function lists users who have read access (pull access) to a GitHub repository.
+**•	Parameters:**
+o	endpoint is constructed as "repos/${REPO_OWNER}/${REPO_NAME}/collaborators", which is the API endpoint for fetching collaborators on the specified repository (REPO_OWNER is the owner of the repository, and REPO_NAME is the name of the repository).
+**•	Action:**
+o	The function calls the previously defined github_api_get function to make a GET request to the GitHub API and fetch the collaborators list for the specified repository.
+o	The output of the GET request ($response) is passed through jq, which is a command-line JSON processor.
+	jq -r: This option is used to output raw (unquoted) data from the JSON response.
+	.[]: This iterates over all items in the JSON array (collaborators).
+	select(.permissions.pull == true): Filters collaborators that have pull permission (read access).
+	.login: Extracts the login (username) of the collaborator.
+o	If no collaborators are found with read access, it prints "No collaborators found". If collaborators are found, it prints their usernames.
+**6. Main Script Execution:**
 
-6. Main Script Execution:
-bash
-# Main script
-echo "Listing users with read access to ${REPO_OWNER}/${REPO_NAME} ..."
+echo "Listing collaborators for ${REPO_OWNER}/${REPO_NAME}..."
 list_users_with_read_access
-Purpose: This section is where the script starts its main execution after defining variables and functions.
-Steps:
-Prints a message indicating the action being performed.
-Calls the list_users_with_read_access function to list collaborators with read access.
-Execution of Shell Script 
+•	This line prints a message indicating that the script is about to list the collaborators for the specified repository.
+•	Then, it calls the list_users_with_read_access function to list the users with read access to the repository.
 
-Detailed Execution Order:
-•	Shebang Line: Specifies the interpreter.
-•	Variable Definitions: Sets up initial variables.
-•	Command-Line Arguments: Assigns values from command-line arguments.
-•	Function Definitions: Defines github_api_get and list_users_with_read_access functions but does not execute them yet.
-Main Script Execution:
-
-# Main script
-echo "Listing users with read access to ${REPO_OWNER}/${REPO_NAME} ..."
-list_users_with_read_access
-
-
-Prints a message using echo.
-•	Calls list_users_with_read_access:
-
-**Command**:  local endpoint="repos/${REPO_OWNER}/${REPO_NAME}/collaborators"
-This line defines a local variable called endpoint and assigns it a URL path as a string.
-repos/: This is a static part of the URL indicating that we are accessing the repositories endpoint of the GitHub API.
-${REPO_OWNER}: This is a variable placeholder that will be replaced with the value of the REPO_OWNER variable. It represents the owner of the repository.
-${REPO_NAME}: This is another variable placeholder that will be replaced with the value of the REPO_NAME variable. It represents the name of the repository.
-/collaborators: This is a static part of the URL indicating that we are accessing the collaborators endpoint for the specified repository
-
-**Command**:  collaborators="$(github_api_get "$endpoint" | jq -r '.[] | select(.permissions.pull == true) | .login')"
-
-Calling the Function:
-github_api_get "$endpoint": This part calls the github_api_get function with the endpoint as its argument.The endpoint variable holds the URL path for the GitHub API request (e.g., repos/octocat/Hello-World/collaborators).
-
-Capturing the Output:
-The output of github_api_get (the response from the GitHub API) is captured and piped (|) to jq. Inside this function, it calls github_api_get to fetch data from the GitHub API.
-Filters and prints the list of users with read access.
-•	jq: A command-line JSON processor used to parse and filter JSON data.
-•	.[]: Iterates over each item in the JSON array.
-•	select(.permissions.pull == true): Filters items where the pull permission is true, meaning the user has read access.
-•	.login: Extracts the login field (the username) from the filtered items.
-•	The resulting usernames are assigned to the collaborators variable.
 
 
 
