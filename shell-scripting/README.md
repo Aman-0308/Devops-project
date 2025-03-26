@@ -1,21 +1,15 @@
-1. Shebang Line:#!/bin/bash
+1. Shebang Line: `#!/bin/bash`
 
-This is the **shebang**
-     line, which specifies that the script should be executed using the **Bash**
-     shell.
-
+   This is the **shebang** line, which specifies that the script should be executed using the **Bash** shell.
 
 2. Setting Variables:
 
-API_URL="https://api.github.com"
-
-USERNAME="$USERNAME"
-
-TOKEN="$TOKEN"
-
-REPO_OWNER="$1"
-
-REPO_NAME="$2"
+   ```bash
+   API_URL="https://api.github.com"
+   USERNAME="$USERNAME"
+   TOKEN="$TOKEN"
+   REPO_OWNER="$1"
+   REPO_NAME="$2"
 
 
  API_URL: This variable stores the
