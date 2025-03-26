@@ -1,6 +1,7 @@
 # Shell Scripting
 
-1. Shebang Line
+## 1. Shebang Line
+```bash
 #!/bin/bash
 
 
@@ -37,14 +38,14 @@ function github_api_get {
 This function is defined to make a GET request to the GitHub API.
 
 •	Parameters:
-o	endpoint is passed as a parameter ($1) when calling the function. It specifies which part of the GitHub API to query.
-o	url combines the API_URL with the endpoint to create the full URL for the API request.
+- endpoint is passed as a parameter ($1) when calling the function. It specifies which part of the GitHub API to query.
+- url combines the API_URL with the endpoint to create the full URL for the API request.
 
 •	Action:
-o	It uses curl to send an HTTP GET request to the GitHub API.
-o	The -s option tells curl to run silently (no progress bar).
-o	The -u "${USERNAME}:${TOKEN}" option passes the USERNAME and TOKEN for basic authentication.
-o	The result of the curl request (GitHub API response) is stored in the variable response.
+- It uses curl to send an HTTP GET request to the GitHub API.
+- The -s option tells curl to run silently (no progress bar).
+- The -u "${USERNAME}:${TOKEN}" option passes the USERNAME and TOKEN for basic authentication.
+- The result of the curl request (GitHub API response) is stored in the variable response.
 
 
 5. Defining the Function list_users_with_read_access:
@@ -69,13 +70,13 @@ function list_users_with_read_access {
 o	endpoint is constructed as "repos/${REPO_OWNER}/${REPO_NAME}/collaborators", which is the API endpoint for fetching collaborators on the specified repository (REPO_OWNER is the owner of the repository, and REPO_NAME is the name of the repository).
 
 •	Action:
-o	The function calls the previously defined github_api_get function to make a GET request to the GitHub API and fetch the collaborators list for the specified repository.
-o	The output of the GET request ($response) is passed through jq, which is a command-line JSON processor.
-	jq -r: This option is used to output raw (unquoted) data from the JSON response.
-	.[]: This iterates over all items in the JSON array (collaborators).
-	select(.permissions.pull == true): Filters collaborators that have pull permission (read access).
-	.login: Extracts the login (username) of the collaborator.
-o	If no collaborators are found with read access, it prints "No collaborators found". If collaborators are found, it prints their usernames.
+- The function calls the previously defined github_api_get function to make a GET request to the GitHub API and fetch the collaborators list for the specified repository.
+- The output of the GET request ($response) is passed through jq, which is a command-line JSON processor.
+- jq -r: This option is used to output raw (unquoted) data from the JSON response.
+- .[]: This iterates over all items in the JSON array (collaborators).
+- select(.permissions.pull == true): Filters collaborators that have pull permission (read access).
+- .login: Extracts the login (username) of the collaborator.
+- If no collaborators are found with read access, it prints "No collaborators found". If collaborators are found, it prints their usernames.
 
 
 6. Main Script Execution:
