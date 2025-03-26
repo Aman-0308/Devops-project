@@ -1,7 +1,6 @@
 # Shell Scripting
 
-## 1. Shebang Line
-```bash
+1. Shebang Line
 #!/bin/bash
 
 
