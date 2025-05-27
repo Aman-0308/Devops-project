@@ -1,0 +1,113 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name.customerService }}-deployment
+  namespace: {{ .Values.namespace | default "epharmacy" }}
+  labels:
+    name: {{ .Values.name.customerService }}
+    version: {{ .Values.version | default "v1" }}
+spec:
+  replicas: {{ .Values.replicaCount | default 1 }}
+  selector:
+    matchLabels:
+      name: {{ .Values.name.customerService }}
+      version: {{ .Values.version | default "v1" }}
+  template:
+    metadata:
+      labels:
+        name: {{ .Values.name.customerService }}
+        role: {{ .Values.role | default "backend" }}
+        version: {{ .Values.version | default "v1" }}
+    spec:
+      serviceAccountName: {{ .Values.serviceAccountName | default "default" }}
+      securityContext:
+        runAsUser: {{ .Values.securityContext.runAsUser | default 1000 }}
+        runAsNonRoot: true
+      tolerations:
+        - key: "nodeType"
+          operator: "Equal"
+          value: {{ .Values.tolerations.nodeTypeValue | default "Node01" }}
+          effect: "NoSchedule"
+      nodeSelector:
+        node-type: {{ .Values.nodeSelector.nodeType | default "Node01" }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: nodeType
+                    operator: In
+                    values:
+                      - {{ .Values.nodeSelector.nodeType | default "Node01" }}
+      containers:
+        - name: customerService
+          image: {{ .Values.image.customerService }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
+          ports:
+            - containerPort: {{ .Values.containerPort.customerService | default 6500 }}
+          envFrom:
+            - configMapRef:
+                name: customer-config
+            - configMapRef:
+                name: backend-config
+            - secretRef:
+                name: customer-secret
+            - secretRef:
+                name: backend-secret
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          resources:
+            requests:
+              memory: {{ .Values.resources.requests.memory | quote }}
+              cpu: {{ .Values.resources.requests.cpu | quote }}
+            limits:
+              memory: {{ .Values.resources.limits.memory | quote }}
+              cpu: {{ .Values.resources.limits.cpu | quote }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.containerPort.customerService | default 6500 }}
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds | default 120 }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds | default 20 }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.containerPort.customerService | default 6500 }}
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds | default 200 }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds | default 10 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.name.customerService }}-service
+  namespace: {{ .Values.namespace | default "epharmacy" }}
+  labels:
+    name: {{ .Values.name.customerService }}
+    version: {{ .Values.version | default "v1" }}
+spec:
+  type: {{ .Values.service.type | default "ClusterIP" }}
+  ports:
+    - name: http
+      port: 80
+      targetPort: {{ .Values.containerPort.customerService | default 6500 }}
+      protocol: TCP
+    - name: https
+      port: 443
+      targetPort: {{ .Values.containerPort.customerService | default 6500 }}
+      protocol: TCP
+  selector:
+    name: {{ .Values.name.customerService }}
+    role: {{ .Values.role | default "backend" }}
+    version: {{ .Values.version | default "v1" }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: customer-config
+  labels:
+    app: Epharmacy-application  
+data:
+  server.servlet.context-path: "/epharmacy/customer"
+  baseUrl: "http://customer-service:6500/epharmacy/customer/customer-api"
+ 

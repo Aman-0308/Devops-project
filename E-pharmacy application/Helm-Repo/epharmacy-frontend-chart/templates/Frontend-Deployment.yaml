@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: Epharmacy-frontend
+  namespace: Epharmacy
+  labels:
+    role: frontend
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      role: frontend
+  template:
+    metadata:
+      labels:
+        role: frontend
+    spec:
+      serviceAccountName: default
+      securityContext:
+        runAsUser: 1000
+      tolerations:
+        - key: "nodeType"
+          operator: "Equal"
+          value: "Node01"
+          effect: "NoSchedule"
+      nodeSelector:
+        node-type: Node01
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: "nodeType"
+                    operator: In
+                    values:
+                      - "Node01"
+      containers:
+        - name: frontendService
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.service.targetPort }}
+          envFrom:
+            - configMapRef:
+                name: frontend-configmap
+            - secretRef:
+                name: frontend-secret
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.service.targetPort }}
+            initialDelaySeconds: 120
+            periodSeconds: 20
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.service.targetPort }}
+            initialDelaySeconds: 200
+            periodSeconds: 10
+          volumeMounts:
+            - name: my-volume
+              mountPath: /logs
+      volumes:
+        - name: my-volume
+          persistentVolumeClaim:
+            claimName: {{ .Values.pvc.claimName }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontendService
+  namespace: Epharmacy
+  labels:
+    role: frontend
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+    - name: https
+      port: 443
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+  selector:
+    role: frontend
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-configmap
+  namespace: Epharmacy
+data:
+  customerLoginUrl: {{ .Values.env.configMap.customerLoginUrl | quote }}
+  getAllMedicinesUrl: {{ .Values.env.configMap.getAllMedicinesUrl | quote }}
+  registerCustomerUrl: {{ .Values.env.configMap.registerCustomerUrl | quote }}
+  getCustomerCartUrl: {{ .Values.env.configMap.getCustomerCartUrl | quote }}
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: frontend-secret
+  namespace: Epharmacy
+type: Opaque
+data: {} 
+---       

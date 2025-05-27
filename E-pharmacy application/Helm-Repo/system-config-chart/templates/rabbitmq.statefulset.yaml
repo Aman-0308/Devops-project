@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.rabbitmq.name | default "rabbitmq" }}
+  labels:
+    app: {{ .Values.rabbitmq.appLabel | default "rabbitmq" }}
+spec:
+  clusterIP: None  # Headless service
+  selector:
+    app: {{ .Values.rabbitmq.appLabel | default "rabbitmq" }}
+  ports:
+    - name: amqp
+      port: {{ .Values.rabbitmq.amqpPort | default 5672 }}
+    - name: management
+      port: {{ .Values.rabbitmq.managementPort | default 15672 }}
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.rabbitmq.name | default "rabbitmq" }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.rabbitmq.appLabel | default "rabbitmq" }}
+  serviceName: {{ .Values.rabbitmq.name | default "rabbitmq" }}
+  replicas: {{ .Values.rabbitmq.replicas | default 1 }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.rabbitmq.appLabel | default "rabbitmq" }}
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: node
+                    operator: In
+                    values:
+                      - {{ .Values.rabbitmq.nodeName | default "node01" }}
+              topologyKey: "kubernetes.io/hostname"     # ensures the same node all replicas to be scheduled on (affinity).
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: topology.kubernetes.io/zone  # Ensure pods are spread across zones
+                    operator: In
+                    values:
+                      - {{ .Values.rabbitmq.zone | default "us-east-1a" }}  # Make sure pods stay in the same AZ
+      containers:
+      - name: rabbitmq
+        image: {{ .Values.rabbitmq.image | default "rabbitmq:3-management" }}  # Includes the management UI
+        ports:
+          - containerPort: {{ .Values.rabbitmq.amqpPort | default 5672 }}  # AMQP port
+          - containerPort: {{ .Values.rabbitmq.managementPort | default 15672 }}  # Management UI port
+        env:
+          - name: RABBITMQ_DEFAULT_USER
+            value: {{ .Values.rabbitmq.defaultUser | default "admin" }}
+          - name: RABBITMQ_DEFAULT_PASS
+            value: {{ .Values.rabbitmq.defaultPass | default "admin123" }}
+        volumeMounts:
+          - name: rabbitmq-data
+            mountPath: /var/lib/rabbitmq
+  volumeClaimTemplates:                             #Creates a unique PVC per pod
+    - metadata:
+        name: rabbitmq-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: {{ .Values.rabbitmq.storageClass | default "standard" }}
+        resources:
+          requests:
+            storage: {{ .Values.rabbitmq.storage | default "1Gi" }}
+
+
+

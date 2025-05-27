@@ -26,6 +26,8 @@ class Dashboard extends React.PureComponent {
   render() {
     const { user, isLoading, isMenuOpen, toggleDashboardMenu } = this.props;
 
+    console.log('User Role:', user.role);
+
     if (isDisabledMerchantAccount(user))
       return <DisabledMerchantAccount user={user} />;
 

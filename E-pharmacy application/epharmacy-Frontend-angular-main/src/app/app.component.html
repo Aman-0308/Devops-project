@@ -1,0 +1,69 @@
+<div>
+    <nav class="navbar bgColour navbar-dark navbar-expand-md ">
+        <a class="navbar-brand" href="/">
+            <img class="rounded" src="./assets/logo1.png" width="150px" alt="logo">
+        </a>
+
+        <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#myData123">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="myData123">
+
+            <ul *ngIf="!loggedIn" class="navbar-nav" style="margin-left: auto;">
+                <li class="nav-item">
+                    <a class="nav-link" [routerLink]="['/login']">Sign in | Sign up</a>
+                </li>
+            </ul>
+
+            <ul *ngIf="loggedIn==true && role=='Customer'" class="navbar-nav">
+                <li class="nav-item">
+                    <a routerLink="medicine" routerLinkActive="active" class="nav-link">Medicines</a>
+                </li>
+            </ul>
+            <ul *ngIf="loggedIn==true && role=='Pharmacist'" class="navbar-nav">
+                <li class="nav-item">
+                    <a routerLink="pharmacist" routerLinkActive="active" class="nav-link">My Medicines</a>
+                </li>
+            </ul>
+
+            <ul *ngIf="loggedIn" class="nav navbar-nav" style="margin-left: auto;">
+                <li class="nav-item" *ngIf="role=='Customer'">
+                    <a routerLink="customerCart" routerLinkActive="active" class="nav-link">
+                        <span><mat-icon matBadge="{{cart.length}}">
+                            shopping_cart
+                        </mat-icon></span>
+                    </a>
+                </li>
+                <!-- <li class="nav-item">
+                    <a routerLink="" routerLinkActive="active" class="nav-link">
+                        <span>Welcome {{loggedInPerson}}</span>
+                    </a>
+                </li> -->
+                <li style="margin-left: 3px;" class="nav-item dropdown" routerLinkActive="active">
+                    <button class="btn bgColour nav-link dropdown-toggle" [matMenuTriggerFor]="menu">
+                        <!-- <span class="material-icons">account_circle</span> -->
+                        <span>Welcome {{loggedInPerson | titlecase}}</span>
+                    </button>
+                    <mat-menu #menu="matMenu">
+                        <button *ngIf="role=='Customer'" mat-menu-item>
+                            <a routerLink="customerDetails" routerLinkActive="active" class="nav-link">My Profile</a>
+                        </button>
+
+                        <button *ngIf="role=='Customer'" mat-menu-item>
+                            <a routerLink="viewOrder" routerLinkActive="active" class="nav-link">My Orders</a>
+                        </button>
+
+                        <button mat-menu-item>
+                            <a href="/" class="nav-link" routerLinkActive="active" (click)="logout()">Logout</a>
+                        </button>
+                    </mat-menu>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</div>
+
+<div>
+    <router-outlet></router-outlet>
+</div>

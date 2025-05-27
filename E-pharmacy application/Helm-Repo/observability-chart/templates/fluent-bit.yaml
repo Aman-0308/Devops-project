@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluent-bit
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: fluent-bit
+  template:
+    metadata:
+      labels:
+        app: fluent-bit
+    spec:
+      serviceAccountName: {{ .Values.fluent-bit.serviceAccountName | default "fluent-bit" }}
+      containers:
+      - name: fluent-bit
+        image: {{ .Values.fluent-bit.image.repository" }}
+        volumeMounts:
+        - name: fluentbit_varlog           
+          mountPath: /var/log
+        - name: fluentbit_containers
+          mountPath: /var/log/containers
+          readOnly: true
+        - name: fluentbit_config
+          mountPath: /fluent-bit/etc/
+      volumes:
+      - name: fluentbit_varlog
+        hostPath:                                                              # mounts /var/log from the node into the container's filesystem (e.g., /var/log inside container points to the host's /var/log).
+          path: {{ .Values.fluent-bit.volumes.varlog }}                   # fluent-bit will read system logs from the node's /var/log directory.
+          type: Directory
+      - name: fluentbit_containers
+        hostPath:
+          path: {{ .Values.fluent-bit.volumes.containers }}         # All container logs are stored in /var/log/containers on the node.
+          type: Directory                                                # # fluent-bit will read all container logs from the node's /var/log/containers directory.
+      - name: fluentbit_config
+        configMap:
+            name: fluent-bit-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluent-bit-config
+  namespace: monitoring
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Flush        1
+        Daemon       Off
+        Log_Level    info
+
+    [INPUT]
+        Name              tail
+        Path              /var/log/containers/*.log
+        Parser            cri
+        Tag               kube.*
+
+    [OUTPUT]
+        Name              stdout
+        Match             *
+    
+    [INPUT]
+        Name   tail
+        Path   /var/log/syslog,/var/log/messages
+        Parser syslog
+        Tag    host.*\
+---

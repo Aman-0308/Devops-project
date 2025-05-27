@@ -45,7 +45,8 @@ export const signUp = () => {
         email: 'required|email',
         password: 'required|min:6',
         firstName: 'required',
-        lastName: 'required'
+        lastName: 'required',
+        role: 'required' // Add validation for role
       };
 
       const newUser = getState().signup.signupFormData;
@@ -55,7 +56,8 @@ export const signUp = () => {
         'required.email': 'Email is required.',
         'required.password': 'Password is required.',
         'required.firstName': 'First Name is required.',
-        'required.lastName': 'Last Name is required.'
+        'required.lastName': 'Last Name is required.',
+        'required.role': 'Role is required.' // Add error message for role
       });
 
       if (!isValid) {
@@ -67,7 +69,7 @@ export const signUp = () => {
 
       const user = {
         isSubscribed,
-        ...newUser
+        ...newUser // Include role in the user object
       };
 
       const response = await axios.post(`${API_URL}/auth/register`, user);

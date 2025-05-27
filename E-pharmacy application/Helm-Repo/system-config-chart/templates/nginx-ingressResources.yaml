@@ -1,0 +1,40 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: epharmacy-ingress
+  namespace: {{ .Values.namespace | default "default" }}
+spec:
+  defaultBackend:
+    service:
+      name: {{ .Values.defaultBackend.service.name | default "default-service" }}
+      port:
+        number: {{ .Values.defaultBackend.service.port | default 80 }}
+  ingressClassName: {{ .Values.ingressClassName | default "nginx" }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host | default "www.epharmacy.com" }}
+      secretName: {{ .Values.ingress.tlsSecret | default "gateway-secret" }}
+  rules:
+    - host: {{ .Values.ingress.host | default "www.epharmacy.com" }}
+      http:
+        paths:
+{{- range .Values.ingress.paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType | default "Prefix" }}
+            backend:
+              service:
+                name: {{ .serviceName }}
+                port:
+                  number: {{ .servicePort }}
+{{- end }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Values.ingress.tlsSecret | default "tls-secret" }}
+  namespace: {{ .Values.namespace | default "default" }}
+type: kubernetes.io/tls
+data:
+  tls.crt: {{ .Values.tlsCrt | quote }}
+  tls.key: {{ .Values.tlsKey | quote }}
+

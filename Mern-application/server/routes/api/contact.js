@@ -3,7 +3,6 @@ const router = express.Router();
 
 // Bring in Models & Helpers
 const Contact = require('../../models/contact');
-const mailgun = require('../../services/mailgun');
 
 router.post('/add', async (req, res) => {
   try {
@@ -42,8 +41,6 @@ router.post('/add', async (req, res) => {
     });
 
     const contactDoc = await contact.save();
-
-    await mailgun.sendEmail(email, 'contact');
 
     res.status(200).json({
       success: true,

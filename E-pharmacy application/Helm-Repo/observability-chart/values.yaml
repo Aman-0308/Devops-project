@@ -1,0 +1,39 @@
+fluent-bit:
+  serviceAccountName: fluent-bit
+  image:
+    repository: fluent/fluent-bit:2.2
+  volumes:
+      varlog: /var/log
+      containers: /var/log/containers
+
+kube-state-metrics:
+  image: quay.io/coreos/kube-state-metrics:v2.10.0
+  ports:
+  http-metrics: 8080
+  telemetry: 8081
+
+node-exporter:
+  image: prom/node-exporter:latest
+  ports:
+    port: 9100
+  volumes:
+      proc: /var/proc
+      sys: /var/sys
+  resources:
+          limits:
+            memory: 100Mi
+            cpu: 100m
+          requests:
+            memory: 50Mi
+            cpu: 50m
+
+prometheus-adapter:
+  image: directxman12/k8s-prometheus-adapter-amd64:v0.8.3
+  serviceAccountName: prometheus-adapter
+  ports:
+    port: 6443
+  args:
+    args1: --config=/etc/adapter/config.yaml
+    args2: --metrics-relist-interval=30s
+  
+ 

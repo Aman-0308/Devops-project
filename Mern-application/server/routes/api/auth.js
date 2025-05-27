@@ -10,7 +10,6 @@ const auth = require('../../middleware/auth');
 // Bring in Models & Helpers
 const User = require('../../models/user');
 const mailchimp = require('../../services/mailchimp');
-const mailgun = require('../../services/mailgun');
 const keys = require('../../config/keys');
 const { EMAIL_PROVIDER, JWT_COOKIE } = require('../../constants');
 
@@ -82,12 +81,13 @@ router.post('/login', async (req, res) => {
 
 router.post('/register', async (req, res) => {
   try {
-    const { email, firstName, lastName, password, isSubscribed } = req.body;
+    const { email, firstName, lastName, password, isSubscribed, role } = req.body;
+
+    console.log('Request Body:', req.body); // Log the request payload
+    console.log('Role:', role); // Log the role field
 
     if (!email) {
-      return res
-        .status(400)
-        .json({ error: 'You must enter an email address.' });
+      return res.status(400).json({ error: 'You must enter an email address.' });
     }
 
     if (!firstName || !lastName) {
@@ -98,12 +98,15 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'You must enter a password.' });
     }
 
+    if (!role) {
+      console.log('Error: Role is missing'); // Log missing role error
+      return res.status(400).json({ error: 'You must specify a role.' });
+    }
+
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
-      return res
-        .status(400)
-        .json({ error: 'That email address is already in use.' });
+      return res.status(400).json({ error: 'That email address is already in use.' });
     }
 
     let subscribed = false;
@@ -119,7 +122,8 @@ router.post('/register', async (req, res) => {
       email,
       password,
       firstName,
-      lastName
+      lastName,
+      role, // Assign the role provided in the request body
     });
 
     const salt = await bcrypt.genSalt(10);
@@ -131,13 +135,6 @@ router.post('/register', async (req, res) => {
     const payload = {
       id: registeredUser.id
     };
-
-    await mailgun.sendEmail(
-      registeredUser.email,
-      'signup',
-      null,
-      registeredUser
-    );
 
     const token = jwt.sign(payload, secret, { expiresIn: tokenLife });
 
@@ -186,13 +183,6 @@ router.post('/forgot', async (req, res) => {
 
     existingUser.save();
 
-    await mailgun.sendEmail(
-      existingUser.email,
-      'reset',
-      req.headers.host,
-      resetToken
-    );
-
     res.status(200).json({
       success: true,
       message: 'Please check your email for the link to reset your password.'
@@ -232,8 +222,6 @@ router.post('/reset/:token', async (req, res) => {
     resetUser.resetPasswordExpires = undefined;
 
     resetUser.save();
-
-    await mailgun.sendEmail(resetUser.email, 'reset-confirmation');
 
     res.status(200).json({
       success: true,
@@ -279,8 +267,6 @@ router.post('/reset', auth, async (req, res) => {
     const hash = await bcrypt.hash(confirmPassword, salt);
     existingUser.password = hash;
     existingUser.save();
-
-    await mailgun.sendEmail(existingUser.email, 'reset-confirmation');
 
     res.status(200).json({
       success: true,

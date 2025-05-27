@@ -1,0 +1,93 @@
+global:
+  namespace: epharmacy
+  role: backend
+  version: v1
+
+replicaCount: 1
+
+name:
+  authValidation: auth-validation
+  credentialsValidation: auth-credentials-validation
+  entitlementValidation: auth-entitlement-validation
+  deviceValidation: auth-device-validation
+  sessionValidation: auth-session-validation
+  rsaValidation: auth-rsa
+  accessValidation: auth-access
+
+image:
+  pullPolicy: IfNotPresent
+  authValidation: auth-validation:v1
+  credentialsValidation: auth-credentials-validation:v1
+  entitlementValidation: auth-entitlement-validation:v1
+  deviceValidation: auth-device-validation:v1
+  sessionValidation: auth-session-validation:v1
+  rsaValidation: auth-rsa:v1
+  accessValidation: auth-access:v1
+
+
+service:
+  type: ClusterIP
+
+containerPort: 1100
+
+resources:
+  requests:
+    memory: "1Gi"
+    cpu: "500m"
+  limits:
+    memory: "1Gi"
+    cpu: "1"
+
+env:
+  authConfigMap: auth-config
+  backendConfigMap: backend-config
+  authSecret: auth-secret
+  backendSecret: backend-secret
+
+serviceAccountName: default
+
+securityContext:
+  runAsUser: 1000
+
+tolerations:
+  nodeTypeValue: Node01
+
+nodeSelector:
+  nodeType: Node01
+
+readinessProbe:
+  initialDelaySeconds: 120
+  periodSeconds: 20
+
+livenessProbe:
+  initialDelaySeconds: 200
+  periodSeconds: 10
+
+configmap:
+  serverContextPath: "/epharmacy"
+  authBaseUrl: "http://auth-service:1100/epharmacy/auth-api"
+  successRedirectUrl: "http://auth-service:1100/epharmacy/auth-api/auth"
+  authApi: "/auth-api"
+  authAccessApi: "/auth-api/access"
+  authAccessBaseUrl: "http://auth-access:1200/epharmacy/auth-api/access"
+  authCredentialsValidationApi: "/auth-api/credentialsValidation"
+  authCredentialsValidationBaseUrl: "http://auth-credentialsValidation:1300/auth-api/credentialsValidation"
+  authEntitlementValidationApi: "/auth-api/credentialsValidation"
+  authEntitlementValidationBaseUrl: "http://auth-entitlementValidation:1400/auth-api/credentialsValidation"
+  authDeviceValidationApi: "/auth-api/credentialsValidation"
+  authDeviceValidationBaseUrl: "http://auth-deviceValidation:1500/epharmacy/auth-api/credentialsValidation"
+  authSessionValidationApi: "/auth-api/credentialsValidation"
+  authSessionValidationBaseUrl: "http://auth-sessionValidation:1600/epharmacy/auth-api/credentialsValidation"
+  authVendorValidationApi: "/auth-api/credentialsValidation"
+  authVendorValidationBaseUrl: "http://auth-vendorValidation:1700/epharmacy/auth-api/credentialsValidation"
+
+secret:
+  REDIS_URL: <base64-encoded-redis-url>
+  REDIS_HOST: <base64-encoded-redis-host>
+  REDIS_PORT: <base64-encoded-redis-port>
+  REDIS_USERNAME: <base64-encoded-redis-username>
+  REDIS_PASSWORD: <base64-encoded-redis-password>
+  JWT_KEY: <base64-encoded-jwt-key>
+  JWT_KEY1: <base64-encoded-jwt-key1>
+  LDAP_USERNAME: "admin.example.com"
+  LDAP_PASSWORD: "Rahul@123"

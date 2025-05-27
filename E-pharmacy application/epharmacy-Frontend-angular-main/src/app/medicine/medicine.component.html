@@ -1,0 +1,142 @@
+
+<!-- Search Bar -->
+<div class="row" style="padding: 15px;">
+    <div class="col-md-8 offset-md-2" *ngIf="!viewDetails">
+        <div class="input-group mb-3">
+            <input list="medicines" class="form-control shadow-button" placeholder="Search using medicine name..."
+                [(ngModel)]="searchText">
+            <datalist id="medicines">
+                <option *ngFor="let medicineName of medicineNames" value="{{medicineName}}">{{medicineName}}</option>
+            </datalist>
+            <div>
+                <button class="btn btn1  shadow-button" (click)="search()" type="button">Search</button>
+            </div>
+            <!-- display categories -->
+            <div class="categories">
+                <button class="btn" (click)="category ='Allopathy';categorise()">Allopathy</button>
+                <button class="btn" (click)="category ='Homeopathy';categorise()">Homeopathy</button>
+                <button class="btn" (click)="category ='Ayush';categorise()">Ayush</button>
+                <button class="btn" (click)="category ='Covid Essentials';categorise()">Covid Essentials</button>
+                <button class="btn" (click)="category ='Fitness';categorise()">Fitness</button>
+                <button class="btn" (click)="category ='Diabetes';categorise()">Diabetes</button>
+                <button class="btn" (click)="category ='Veterinary';categorise()">Veterinary</button>
+                <button class="btn" (click)="category ='Mom & Baby';categorise()">Mom & Baby</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2" *ngIf="!viewDetails">
+        <button class="btn shadow-button nav-link dropdown-toggle" [matMenuTriggerFor]="menu">
+            <span style="font-size: 16px;">Sort By</span>
+        </button>
+        <mat-menu #menu="matMenu">
+            <button mat-menu-item>
+                <a class="nav-link" (click)="sortLowToHigh()">Price: Low to High</a>
+            </button>
+        
+            <button mat-menu-item>
+                <a class="nav-link" (click)="sortHighToLow()">Price: High to Low</a>
+            </button>
+
+            <button mat-menu-item>
+                <a class="nav-link" (click)="sortAtoZ()">Name: A to Z</a>
+            </button>
+            
+            <button mat-menu-item>
+                <a class="nav-link" (click)="sortZtoA()">Name: Z to A</a>
+            </button>
+        </mat-menu>
+    </div>
+</div>
+
+<!-- Show all Medicines -->
+<div class="container-fluid">
+    <div *ngIf="medicineListToDisplay.length!=null && medicineListToDisplay.length>0">
+        <div *ngIf="!viewDetails">
+            <div class="row">
+                <div class="card-group">
+                    <div *ngFor="let medicine of getMedicineListToDisplay()" style="padding: 2px; margin-left: 20px; margin-bottom: 20px;">
+                        <a class="nav-link" (click)="setSelectedMedicine(medicine)">
+                            <div class="card hoverable">
+                                <div class="card-header text-white" style="background-color: rgb(6, 62, 38);">
+                                    <div class="text-truncate">{{medicine.medicineName}}</div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="image-box">
+                                        <img [src]="'assets/'+ medicine.medicineId+'.png'" class="img-fluid center-block" alt="Image Not Found">
+                                        
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <span style="font-size: 14px; color: rgb(6,62,38);"><strong>{{medicine.price | currency : "INR"}}</strong></span>
+                                    <span class="text-muted" style="font-size: 11px; text-decoration: line-through;">
+                                        {{medicine.price*100/(100-medicine.discountPercent)| currency : "INR"}}</span><br>
+                                    <span class="text-success" style="font-size: 14px;"> <strong>GET {{medicine.discountPercent}} % off</strong></span>
+                                </div>
+                                <div *ngIf="loggedIn">
+                                    <button class="btn btn-primary form-control">Add to Cart</button>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 offset-md-4 text-center">
+                <!-- <button class="btn btn1" [disabled]="pageNumber==0" (click)="pageNumber=pageNumber-1;getAllMedicines()">Previous Page</button> &nbsp;
+                <button class="btn btn1" (click)="pageNumber=pageNumber+1;getAllMedicines()">Next Page</button> -->
+                <button class="btn btn1" [disabled]="startIndex==0" (click)="onPrevious()">Previous
+                    Page</button> &nbsp;
+                <button class="btn btn1" [disabled]="displayLength<=endIndex" (click)="onNext()">Next Page</button>
+            </div>
+            <br><br>
+            
+        </div>
+    </div>
+</div>
+
+<div *ngIf="medicineListToDisplay.length==0">
+    <div class="text-danger text-center" style="font-size:20px;">No products available!!</div>
+</div>
+
+<!-- Display All Details of Selected Medicines -->
+<div class="container" *ngIf="viewDetails">
+    <div class="row" style="margin-left: 4.5%; margin-bottom: 1%;">
+        <div class="col-md-2">
+            <a (click)="goBack()" class="btn btn1">Back</a>
+        </div>
+        <div class="col-md-8 text-center" style="font-size: 20px;">
+            <span *ngIf="successMessage!=null && successMessage!=''" class="text-success">
+                {{successMessage}}
+            </span>
+            <span *ngIf="errorMessage!=null && errorMessage!=''" class="text-danger">
+                {{errorMessage}}
+            </span>
+        </div>
+    </div>
+    <div class="row" style="border: 1px solid rgb(6,62,38); margin-left: 5%; margin-right: 5%; border-radius: 10px;">
+        <div class="col-md-4 image-box">
+            <br>
+            <img [src]="'./assets/'+selectedMedicine.medicineId+'.png'" class="img-fluid" alt="Not Found">
+           
+        </div>
+        <div class="col-md-6">
+            <br />
+            <p style="font-size: 25px;">{{selectedMedicine.medicineName}}</p>
+            <strong *ngIf="selectedMedicine.quantity > 0 else outOfStock" style="color:rgb(28, 109, 74)">In Stock</strong> <br>
+            <ng-template #outOfStock>
+                <span class="text-danger"><strong>Out of Stock</strong></span> <br>
+            </ng-template>
+            <strong>Category :</strong> {{selectedMedicine.category}} <br>
+            <strong>Manufacturer :</strong> {{selectedMedicine.manufacturer}} <br>
+            <strong>Manufacturing Date :</strong> {{selectedMedicine.manufacturingDate}} <br>
+            <strong>Expiry Date :</strong> {{selectedMedicine.expiryDate}} <br>
+            <br>
+            <button class="btn btn1" (click)="addToCart()">Add to Cart</button>
+        </div>
+        <div class="col-md-2">
+            <br />
+            <p style="font-size: 20px; color: rgb(6, 62, 38);"><strong>{{selectedMedicine.price | currency : "INR"}}</strong></p>
+            <p style="font-size: 13px; text-decoration: line-through;">{{actualPrice | currency : "INR"}}</p>
+            <p style="font-size: 16px; color: rgb(3, 93, 54);"><strong>GET {{selectedMedicine.discountPercent}} % off</strong></p>
+        </div>
+    </div>
+</div>

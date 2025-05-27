@@ -1,0 +1,24 @@
+Place Order : POST Request
+url : http://localhost:6300/epharmacy/order-api/order/place
+Request Body
+{
+	"orderValueBeforeDiscount":1000.0
+	"customer":{"customerId":101};
+	"deliveryAddress":{"addressId":1};
+	"card":{
+				"cardId":"1234123412341234",
+    			"cvv":"123",
+    			"customerId":101
+    		}
+}
+--------------------------------------
+Get all order: GET Request
+url : http://localhost:6300/epharmacy/order-api/order/all
+------------------------------------------------------------------
+Cancel Order : PUT Request
+url : http://localhost:6300/epharmacy/order-api/order/cancel
+Request Body
+{
+	"reasonToCancel":"Delivery delayed"
+}
+-------------------------------------------------------------

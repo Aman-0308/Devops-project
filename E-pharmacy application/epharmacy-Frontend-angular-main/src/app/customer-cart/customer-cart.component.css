@@ -1,0 +1,15 @@
+.image-box {
+    height: 300px;
+    width: 250px;
+    overflow: hidden;
+    align-content: center;
+}
+.btn-gray{
+    background-color: rgb(234, 246, 242);
+    outline:1px solid green;
+}
+
+.btn1 {
+    background-color: rgb(6, 62, 38);
+    color: white;
+}

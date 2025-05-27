@@ -1,0 +1,58 @@
+global:
+  namespace: epharmacy
+  role: backend
+  version: v1
+
+replicaCount: 2
+
+name:
+  cartService: cart-service
+  customerService: customer-service
+  medicineService: medicine-service
+  orderService: order-service
+  paymentService: payment-service
+
+image:
+  pullPolicy: IfNotPresent
+  cartService: cart-service:v1
+  customerService: customer-service:v1
+  medicineService: medicine-service:v1
+  orderService: order-service:v1
+  paymentService: payment-service:v1
+
+service:
+  type: ClusterIP
+
+containerPort:
+  cartService: 6300
+  customerService: 6500
+  medicineService: 6400
+  orderService: 6600
+  paymentService: 6700
+
+resources:
+  requests:
+    memory: "1Gi"
+    cpu: "500m"
+  limits:
+    memory: "1Gi"
+    cpu: "1"
+
+serviceAccountName: default
+
+securityContext:
+  runAsUser: 1000
+
+tolerations:
+  nodeTypeValue: Node01
+
+nodeSelector:
+  nodeType: Node01
+
+readinessProbe:
+  initialDelaySeconds: 120
+  periodSeconds: 20
+
+livenessProbe:
+  initialDelaySeconds: 200
+  periodSeconds: 10

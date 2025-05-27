@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  namespace: epharmacy
+  labels:
+    app: auth-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+        role: backend
+    spec:
+      serviceAccountName: default  
+      securityContext:
+        runAsUser: 1000
+        runAsNonRoot: true
+      tolerations:
+        - key: "nodeType"
+          operator: "Equal"
+          value: "Node01"
+          effect: "NoSchedule"
+      nodeSelector:
+        node-type: Node01
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: nodeType
+                    operator: In
+                    values:
+                      - Node01
+      containers:
+        - name: authService
+          image: your-image-name:tag  # You must specify an image here
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 1100
+          envFrom:  
+            - configMapRef:
+                name: auth-config
+            - configMapRef:
+                name: backend-config
+            - secretRef:
+                name: auth-secret
+            - secretRef:
+                name: backend-secret
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "500m"
+            limits:
+              memory: "1Gi"
+              cpu: "1"  
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 1100
+            initialDelaySeconds: 120
+            periodSeconds: 20
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 1100
+            initialDelaySeconds: 200
+            periodSeconds: 10
+
+---
+apiVersion: v1
+kind: service
+metadata:
+  name: auth-service
+  namespace: epharmacy
+  labels:
+    app: auth-service
+spec:
+  type: ClusterIP             # other types are NodePort, LoadBalancer
+  ports: 
+      - name: HTTP
+        port: 80
+        targetPort: 1100
+        protocol: TCP
+      - name: HTTPS
+        port: 443
+        targetPort: 1100
+        protocol: TCP  
+      # nodePort: 30000   - If using NodePort, specify the port number.                
+  selector:
+    app: auth-service
+    role: backend
+---

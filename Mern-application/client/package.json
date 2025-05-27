@@ -18,6 +18,8 @@
     "font-awesome": "^4.7.0",
     "history": "^4.9.0",
     "mobile-detect": "^1.4.4",
+    "package-lock.json": "^1.0.0",
+    "package.json": "^2.0.1",
     "rc-slider": "^9.7.2",
     "react": "^16.8.6",
     "react-autosuggest": "^10.1.0",

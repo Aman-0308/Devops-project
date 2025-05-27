@@ -1,0 +1,21 @@
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: Epharmacy-frontend-vpa
+  namespace: Epharmacy  # Namespace where the VPA will be applied
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: Epharmacy-frontend
+  updatePolicy:
+    updateMode: "Auto"    # Options: Off / Initial / Auto
+  resourcePolicy:
+    containerPolicies:
+    - containerName: '*'    #Apply this policy to all containers in the pod
+      minAllowed:
+        cpu: {{ .Values.resourcePolicy.minAllowed.cpu }}  
+        memory: {{ .Values.resourcePolicy.minAllowed.memory }}
+      maxAllowed:
+        cpu: {{ .Values.resourcePolicy.maxAllowed.cpu }}
+        memory: {{ .Values.resourcePolicy.maxAllowed.cpu }}

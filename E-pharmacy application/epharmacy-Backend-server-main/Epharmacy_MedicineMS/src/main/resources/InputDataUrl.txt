@@ -1,0 +1,18 @@
+Get all medicines page wise : GET Request
+url : http://localhost:6200/epharmacy/medicine-api/medicines/pageNumber/0/pageSize/30
+---------------------------------------------------------------------------------
+
+Get a medicine with given medicineId : GET Request
+url : http://localhost:6200/epharmacy/medicine-api/medicines/1011
+---------------------------------------------------------------------------------
+
+Get medicines of given category : GET Request
+url : http://localhost:6200/epharmacy/medicine-api/medicines/category/Allopathy
+---------------------------------------------------------------------------------
+
+Update medicine stock : PUT Request
+url : http://localhost:6200/epharmacy/medicine-api/medicines/update-stock/medicine/1012
+RequestBody
+{
+	"orderedQuantity":2
+}

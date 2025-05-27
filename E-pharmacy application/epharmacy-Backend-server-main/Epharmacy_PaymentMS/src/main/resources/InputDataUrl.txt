@@ -1,0 +1,37 @@
+Add card for payment : POST Request
+url  : http://localhost:6400/epharmacy/payment-api/payment/add-card
+Request Body 
+{
+    "cardId":"1234123412341234",
+    "nameOnCard":"Srk",
+    "cvv":"123",
+    "expiryDate":"2029-09-09",
+    "cardType":"DEBIT_CARD",
+    "customerId":101
+}
+-----------------------------------------------------------------------
+
+Get all cards of a customer : GET Request
+url : http://localhost:6400/epharmacy/payment-api/payment/view-cards/101
+------------------------------------------------------------------------
+
+Make payment : POST Request
+url : http://localhost:6400/epharmacy/payment-api/payment/amount/1000.03
+Request Body
+{
+    "cardId":"1234123412341230",
+    "nameOnCard":"Srk",
+    "cvv":"123",
+    "expiryDate":"2029-09-09",
+    "cardType":"DEBIT_CARD",
+    "customerId":101
+}
+----------------------------------------------------------------------------
+
+Get payment details of payment with given id : GET Request
+url : http://localhost:6400/epharmacy/payment-api/payment/details/1
+---------------------------------------------------------------------------
+
+Get card details: GET Request
+url : http://localhost:6400/epharmacy/payment-api/payment/card/1234123412341230
+-----------------------------------------------------------

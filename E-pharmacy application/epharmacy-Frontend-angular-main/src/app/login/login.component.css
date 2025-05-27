@@ -1,0 +1,32 @@
+/* .message{
+    color: aliceblue;
+    font-size: 30px;
+    text-align: center;
+} */
+
+.divider:after,
+.divider:before {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #eee;
+}
+
+.h-custom {
+    height: calc(100% - 73px);
+}
+
+@media (max-width: 450px) {
+    .h-custom {
+        height: 100%;
+    }
+}
+
+.card {
+    opacity: 0.95;
+    
+}
+
+.btn-success {
+    background-color: rgb(6, 62, 38);
+}

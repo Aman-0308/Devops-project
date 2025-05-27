@@ -1,0 +1,62 @@
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-exporter
+  namespace: monitoring
+  labels:
+    app: node-exporter
+spec:
+  selector:
+    matchLabels:
+      app: node-exporter
+  template:
+    metadata:
+      labels:
+        app: node-exporter
+    spec:
+      containers:
+      - name: node-exporter
+        image: {{ .Values.node-exporter.image }}
+        ports:
+        - containerPort: {{ .Values.node-exporter.ports.port }}
+          name: metrics
+        resources:
+          limits:
+            memory: {{ .Values.node-exporter.resources.limits.memory }}
+            cpu: {{ .Values.node-exporter.resources.limits.cpu }}
+          requests:
+            memory: {{ .Values.node-exporter.resources.requests.memory }}
+            cpu: {{ .Values.node-exporter.resources.requests.cpu }}
+        volumeMounts:
+        - name: node-exporter-proc            
+          mountPath: {{ .Values.node-exporter.volumes.proc }}
+          readOnly: true
+        - name: node-exporter-sys
+          mountPath: {{ .Values.node-exporter.volumes.sys }}
+          readOnly: true
+        args:
+        - --path.procfs=/host/proc
+        - --path.sysfs=/host/sys
+      volumes:
+      - name: node-exporter-proc
+        hostPath:                             # /proc – provides real-time data about running processes, memory, CPU usage, system uptime, etc.
+          path: {{ .Values.node-exporter.volumes.proc }}
+          type: Directory
+      - name: node-exporter-sys
+        hostPath:                             # /sys – exposes kernel and hardware-related info like devices, block I/O stats, thermal sensors, etc.
+          path: {{ .Values.node-exporter.volumes.sys }}
+          type: Directory
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: node-exporter
+  namespace: monitoring
+spec:
+  type: ClusterIP
+  selector:
+    app: node-exporter
+  ports:
+  - port: {{ .Values.node-exporter.ports.port }}
+    targetPort: metrics

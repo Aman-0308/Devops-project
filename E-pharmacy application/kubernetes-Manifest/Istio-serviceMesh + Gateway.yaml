@@ -1,0 +1,207 @@
+---
+# Istio Service Mesh Configuration with Gateway for Epharmacy Application
+# This configuration sets up Istio as a service mesh for the Epharmacy application, including an ingress gateway (Istio control plane, which includes Istiod (the Istio controller), mTLS for secure communication, and path-based routing for various services.
+# It assumes that Istio is already installed in the Kubernetes cluster and the Epharmacy application is deployed in the Epharmacy namespace.
+# This configuration uses Istio's networking and security features to manage traffic and secure communication between services.
+# By default, Istio installs an Ingress Gateway deployment called istio-ingressgateway in the istio-system namespace. This creates a Kubernetes Service of type LoadBalancer.
+---
+
+#1.Istio Gateway (Public Exposure for Epharmacy application)
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata: 
+  name: epharmacy-gateway
+  namespace: Epharmacy
+spec: 
+  selector:
+    istio: ingressgateway  # Use the default Istio ingress gateway
+  servers:
+    - port:
+        number: 443
+        name: https
+        protocol: HTTPS
+      tls:
+        mode: SIMPLE
+        credentialName: gateway-secret   # Must match the Kubernetes TLS secretName.
+      hosts:
+        - www.epharmacy.com
+
+#2.Enable mTLS in Epharmacy service (secure communication)
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: auth-peer-authentication
+  namespace: Epharmacy
+  spec:
+    mtls:
+      mode: STRICT  # Enforce mTLS for all services in the Epharmacy namespace
+
+#3. Istio VirtualService (Path-based Routing)
+apiVersion: networking.istio.io/v1beta1
+kind: virtualService
+metadata:
+  name: epharmacy-virtualservice
+  namespace: Epharmacy
+spec:
+  hosts:
+    - www.epharmacy.com
+  gateways:
+    - epharmacy-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /epharmacy/auth-api
+      route:
+        - destination:
+            host: auth-service
+            port:
+              number: 1100
+              subset: v1
+          weight: 80
+        - destination:
+            host: auth-service
+            port:
+              number: 1100
+              subset: v2
+            weight: 20
+  #This splits traffic 80/20 between the pods with version: v1 and version: v2.
+  #Configure destination rule: This tells Istio, when someone says subset v1 they mean pods with label version: v1.
+    - match:
+        - uri:
+            prefix: /epharmacy/customer-api
+      route:
+        - destination:
+            host: customer-service
+            port:
+              number: 6100
+
+    - match:
+        - uri:
+            prefix: /epharmacy/cart-api
+      route:
+        - destination:
+            host: cart-service
+            port:
+              number: 6300
+
+    - match:
+        - uri:
+            prefix: /epharmacy/medicine-api
+      route:
+        - destination:
+            host: medicine-service
+            port:
+              number: 6200
+
+    - match:
+        - uri:
+            prefix: /epharmacy/order-api
+      route:
+        - destination:
+            host: order-service
+            port:
+              number: 6500
+
+    - match:
+        - uri:
+            prefix: /epharmacy/payment-api
+      route:
+        - destination:
+            host: payment-service
+            port:
+              number: 6200
+
+    - match:
+        - uri:
+            prefix: /epharmacy
+      route:
+        - destination:
+            host: frontendService
+            port:
+              number: 80
+---
+#4. Istio Destination Rule for each service (for Traffic Splitting, loadbalancing, etc.)
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: auth-service-destination
+  namespace: Epharmacy
+spec:
+  host: auth-service
+  subsets:
+    - name: v1
+      labels:
+        version: v1               # This is the label used to identify the pods for version 1 ( label should be mentioned inside pod spec)
+    - name: v2
+      labels:
+        version: v2
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: customer-service-destination
+  namespace: Epharmacy
+spec:
+  host: customer-service
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: cart-service-destination
+  namespace: Epharmacy
+spec:
+  host: cart-service
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: medicine-service-destination
+  namespace: Epharmacy
+spec:
+  host: medicine-service
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: order-service-destination
+  namespace: Epharmacy
+spec:
+  host: order-service
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: payment-service-destination
+  namespace: Epharmacy
+spec:
+  host: payment-service
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: frontend-service-destination
+  namespace: Epharmacy
+spec:
+  host: frontendService
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN

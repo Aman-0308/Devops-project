@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: configmap
+metadata:
+  name: backend-config
+  namespace: Epharmacy
+data:
+  MEDICINE_SERVICE_URL: "http://medicine-service:6400/epharmacy/medicine/medicine-api"
+  CUSTOMER_SERVICE_URL: "http://customer-service:6500/epharmacy/customer/customer-api"
+  AUTH_SERVICE_URL: "http://auth-service:1100/epharmacy/login/auth-api"
+  CART_SERVICE_URL: "http://cart-service:6300/epharmacy/cart/cart-api"
+  ORDER_SERVICE_URL: "http://order-service:6600/epharmacy/order/order-api"
+  payment_SERVICE_URL: "http://payment-service:6700/epharmacy/payment/payment-api"
+  

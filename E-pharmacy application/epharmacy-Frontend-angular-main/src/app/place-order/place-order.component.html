@@ -1,0 +1,34 @@
+<!-- Place Order -->
+<div class="container">
+    <div class="row mt-4">
+        <div class="col-md-8 offset-2">
+            <p class="text-center" style="font-size: 20px;">Place Order</p>
+            <div class="card">
+                <mat-horizontal-stepper #stepper style="width: 100%;">
+                    <mat-step [editable]="false">
+                        <ng-template matStepLabel>Delivery Address</ng-template>
+                        <h1 style="margin-left: 6%">Select Address for delivery</h1>
+                       
+                        <!-- Fetch All addresses here -->
+
+                    </mat-step>
+                    <!-- //page 2 -->
+                    <mat-step [editable]="false">
+                        <ng-template matStepLabel>Payment</ng-template>
+                        
+                        <!-- Write logic to make payment -->
+                        
+                    </mat-step>
+                    <!-- //page 3 -->
+                    <mat-step [editable]="false">
+                        <ng-template matStepLabel>Order Summary</ng-template>
+                        <p class="text-center">ORDER SUMMARY</p>
+                        
+                        <!-- Write logic to view order summary -->
+
+                    </mat-step>
+                </mat-horizontal-stepper>
+            </div>
+        </div>
+    </div>
+</div>

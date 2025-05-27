@@ -32,7 +32,11 @@ class Signup extends React.PureComponent {
       subscribeChange
     } = this.props;
 
-    if (authenticated) return <Redirect to='/dashboard' />;
+    if (authenticated) {
+      const role = signupFormData.role;
+      const redirectPath = role === 'ROLE MERCHANT' ? '/merchant-dashboard' : '/dashboard';
+      return <Redirect to={redirectPath} />;
+    }
 
     const handleSubmit = event => {
       event.preventDefault();
@@ -102,6 +106,18 @@ class Signup extends React.PureComponent {
                     signupChange(name, value);
                   }}
                 />
+              </Col>
+              <Col xs='12' md='12'>
+                <label htmlFor='role'>Role</label>
+                <select
+                  id='role'
+                  name='role'
+                  value={signupFormData.role}
+                  onChange={(e) => signupChange('role', e.target.value)}
+                >
+                  <option value='ROLE MEMBER'>Member</option>
+                  <option value='ROLE MERCHANT'>Merchant</option>
+                </select>
               </Col>
             </Col>
             <Col

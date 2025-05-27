@@ -1,0 +1,88 @@
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-6 offset-3">
+            <div class="card">
+                <div class="card-header text-center  form-control"
+                    style=" color:white; background-color: rgb(6, 62, 38); "><b>Provide your details</b>
+                </div>
+                <mat-horizontal-stepper #stepper style="width: 100%;">
+
+                    <mat-step [stepControl]="registerForm">
+                        <ng-template matStepLabel>Sign Up</ng-template>
+                        <form [formGroup]="registerForm" class="form">
+
+                            <div class="form-group">
+                                <mat-label>Full Name</mat-label>
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <span class="material-icons">
+                                            account_circle
+                                        </span>
+                                    </div>
+                                    <input type="text" class="form-control" formControlName="fullName" id="fullName" placeholder="Enter full name">
+                                </div>
+                                <span class="text-danger"
+                                    *ngIf="registerForm.controls['fullName'].invalid && registerForm.controls['fullName'].touched">
+                                    Name should contain only alphabets and single space between words!
+                                </span>
+                            </div>
+
+                            <!-- Add the remaining fields -->
+
+                        </form>
+
+                    </mat-step>
+                    <!-- //page 2 -->
+                    <mat-step [stepControl]="registerForm">
+                        <form class="form" [formGroup]="registerForm">
+                            <ng-template matStepLabel>Address</ng-template>
+
+                            <div class="form-group">
+                                <mat-label>Address Name</mat-label>
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <span class="material-icons">
+                                            person_pin
+                                        </span>
+                                    </div>
+                                    <input type="text" formControlName="addressName" id="addressName" class="form-control"
+                                        placeholder="Enter Address Name(Home / Work)">
+                                
+                                </div>
+                                <div class="text-danger" id="addressNameError"
+                                    *ngIf="!registerForm.controls['addressName'].valid && registerForm.controls['addressName'].touched">
+                                    The Address Name field is required.</div>
+                            </div>
+                            
+                            <!-- Add the remaining fields -->
+
+
+                        </form>
+                    </mat-step>
+                    <!-- //page 3 -->
+                    <mat-step>
+                        <ng-template matStepLabel>Done</ng-template>
+                        <p></p>
+
+                        <div class=" text-center set "> We are all set!</div>
+                        <div>
+                            <br>
+                            <div class="form-group">
+                                <div class="d-flex justify-content-center">
+                                    <button mat-button class="btn" type="submit"
+                                        [disabled]=" !registerForm.valid || !registerForm.valid || registerForm.pristine || registerForm.pristine"
+                                        (click)="registerCustomer()" style="color:antiquewhite">Register</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </mat-step>
+
+                </mat-horizontal-stepper>
+
+            </div>
+        </div>
+    </div>
+</div>

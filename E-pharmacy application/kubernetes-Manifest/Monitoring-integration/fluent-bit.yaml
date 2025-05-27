@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluent-bit-config
+  namespace: monitoring
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Flush        1
+        Daemon       Off
+        Log_Level    info
+
+    [INPUT]
+        Name              tail
+        Path              /var/log/containers/*.log
+        Parser            docker
+        Tag               kube.*
+
+    [OUTPUT]
+        Name              stdout
+        Match             *
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluent-bit
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: fluent-bit
+  template:
+    metadata:
+      labels:
+        app: fluent-bit
+    spec:
+      serviceAccountName: fluent-bit
+      containers:
+      - name: fluent-bit
+        image: fluent/fluent-bit:2.2
+        volumeMounts:
+        - name: fluentbit_varlog
+          mountPath: /var/log
+        - name: fluentbit_containers
+          mountPath: /var/lib/docker/containers
+          readOnly: true
+        - name: fluentbit_config
+          mountPath: /fluent-bit/etc/
+      volumes:
+      - name: fluentbit_varlog
+        persistentVolumeClaim:
+            claimName: monitoring-pvc
+      - name: fluentbit_containers
+        persistentVolumeClaim:
+            claimName: monitoring-pvc
+      - name: fluentbit_config
+        persistentVolumeClaim:
+            claimName: monitoring-pvc

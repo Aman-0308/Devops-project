@@ -1,0 +1,112 @@
+namespace: Epharmacy
+
+tlsCrt: <base64-encoded-tls.crt>
+tlsKey: <base64-encoded-tls.key>
+
+ingress:
+  host: www.epharmacy.com
+  tlsSecret: gateway-secret
+  paths:
+    - path: /epharmacy
+      pathType: Prefix
+      serviceName: frontendService
+      servicePort: 80
+    - path: /epharmacy/auth-api
+      pathType: Prefix
+      serviceName: auth-service
+      servicePort: 1100
+    - path: /epharmacy/customer-api
+      pathType: Prefix
+      serviceName: customer-service
+      servicePort: 6100
+    - path: /epharmacy/cart-api
+      pathType: Prefix
+      serviceName: cart-service
+      servicePort: 6300
+    - path: /epharmacy/medicine-api
+      pathType: Prefix
+      serviceName: medicine-service
+      servicePort: 6200
+    - path: /epharmacy/order-api
+      pathType: Prefix
+      serviceName: order-service
+      servicePort: 6500
+    - path: /epharmacy/payment-api
+      pathType: Prefix
+      serviceName: payment-service
+      servicePort: 6200
+
+defaultBackend:
+  service:
+    name: default-service
+    port: 80
+
+istio:
+  gatewayName: epharmacy-gateway
+  tlsSecret: gateway-secret
+  virtualServiceName: epharmacy-virtualservice
+  routes:
+    - prefix: /epharmacy/auth-api
+      splitting:
+        - host: auth-service
+          port: 1100
+          subset: v1
+          weight: 80
+        - host: auth-service
+          port: 1100
+          subset: v2
+          weight: 20
+    - prefix: /epharmacy/customer-api
+      host: customer-service
+      port: 6100
+    - prefix: /epharmacy/cart-api
+      host: cart-service
+      port: 6300
+    - prefix: /epharmacy/medicine-api
+      host: medicine-service
+      port: 6200
+    - prefix: /epharmacy/order-api
+      host: order-service
+      port: 6500
+    - prefix: /epharmacy/payment-api
+      host: payment-service
+      port: 6200
+    - prefix: /epharmacy
+      host: frontendService
+      port: 80
+  destinationRules:
+    - name: auth-service-destination
+      host: auth-service
+      subsets:
+        - name: v1
+          labels:
+            version: v1
+        - name: v2
+          labels:
+            version: v2
+    - name: customer-service-destination
+      host: customer-service
+    - name: cart-service-destination
+      host: cart-service
+    - name: medicine-service-destination
+      host: medicine-service
+    - name: order-service-destination
+      host: order-service
+    - name: payment-service-destination
+      host: payment-service
+    - name: frontend-service-destination
+      host: frontendService
+
+rabbitmq:
+  name: rabbitmq
+  appLabel: rabbitmq
+  amqpPort: 5672
+  managementPort: 15672
+  replicas: 1
+  nodeName: node01
+  zone: us-east-1a
+  image: rabbitmq:3-management
+  defaultUser: admin
+  defaultPass: admin123
+  storageClass: standard
+  storage: 1Gi

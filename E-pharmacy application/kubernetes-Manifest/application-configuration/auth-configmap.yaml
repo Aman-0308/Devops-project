@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: auth-config
+  labels:
+    app: Epharmacy-application  
+data:
+  server.servlet.context-path: "/epharmacy"
+  auth.base.Url: "http://auth-service:1100/epharmacy/auth-api"
+  successRedirectUrl: "http://auth-service:1100/epharmacy/auth-api/auth"
+  auth-api: "/auth-api"
+  auth-access-api: "/auth-api/access"
+  auth-access.base.Url: "http://auth-access:1200/epharmacy/auth-api/access"
+  auth-credentialsValidation-api: "/auth-api/credentialsValidation"
+  auth-credentialsValidation.base.Url: "http://auth-credentialsValidation:1300/auth-api/credentialsValidation"
+  auth-entitlementValidation-api: "/auth-api/credentialsValidation"
+  auth-entitlementValidation.base.Url: "http://auth-entitlementValidation:1400/auth-api/credentialsValidation"
+  auth-deviceValidation-api: "/auth-api/credentialsValidation"
+  auth-deviceValidation.base.Url: "http://auth-deviceValidation:1500/epharmacy/auth-api/credentialsValidation"
+  auth-sessionValidation-api: "/auth-api/credentialsValidation"
+  auth-sessionValidation.base.Url: "http://auth-sessionValidation:1600/epharmacy/auth-api/credentialsValidation"
+  auth-vendorValidation-api: "/auth-api/credentialsValidation"
+  auth-vendorValidation.base.Url: "http://auth-vendorValidation:1700/epharmacy/auth-api/credentialsValidation"

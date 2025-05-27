@@ -1,0 +1,21 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: Epharmacy-frontend-hpa
+  namespace: Epharmacy  # <-- matches the Deployment namespace
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: Epharmacy-frontend       # <-- matches the Deployment name
+  minReplicas: 2
+  maxReplicas: 3
+  metrics:
+    - type: pods
+      pods:
+        metric: 
+          name: Http_requests per minute
+          target: 
+            type: AverageValue
+            averageValue: "10000"  # Adjust this value based on your application's needs
+        

@@ -1,0 +1,60 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: database-backup-job
+  namespace: epharmacy
+spec:
+  schedule: schedule: "0 0 * * 7"    #Runs at 12:00 AM (midnight) every Sunday
+  jobTemplate:
+    restartPolicy: never
+    volumes:
+       - name: backup-volume
+         persistentVolumeClaim:
+         claimName: backup-pvc
+    spec:
+      backoffLimit: 3               # Number of retries before marking the job as failed
+      template:
+        spec:
+          containers:
+            - name: mysql-backup
+              image: mysql:8
+              command: ["sh", "-c"]
+              args:
+               - |
+                  mysqldump -h mysql-service -u root -p$MYSQL_ROOT_PASSWORD mydatabase \
+                  > /backup/mydatabase-$(date +%F-%H-%M).sql
+              env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: root-password
+              volumeMounts:
+                - mountPath: /backup
+                  name: backup-volume
+          volumes:
+            - name: backup-volume
+              persistentVolumeClaim:
+                claimName: backup-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: backup-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: azure-disk-sc
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: secret
+metadata:
+  name: mysql-secret
+  namespace: Epharmacy
+type: Opaque
+data:
+  root-password: <base64-encoded-password>
+  

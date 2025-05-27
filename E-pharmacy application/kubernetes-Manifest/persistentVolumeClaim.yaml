@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+    name: azure-disk-sc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: azure-disk-sc
+  resources:
+    requests:
+      storage: 5Gi

@@ -1,0 +1,120 @@
+.container {
+    width: 100%;
+}
+
+.row {
+    padding-top: 3%;
+    padding-bottom: 3%;
+}
+
+.card {
+    opacity: 0.95;
+    /* width: 500px; */
+    padding-bottom: 0px;
+    background-color: rgb(88, 228, 167);
+}
+
+.input-group {
+    color: white;
+    background-color: rgb(6, 62, 38);
+    height: 40px;
+    /* margin-top: 20px; */
+    max-width: auto;
+}
+mat-label {
+    font-size: 18px;
+}
+
+.form-group {
+    margin-top: 10px;
+}
+input{
+    height: 40px;
+}
+select{
+    height: 40px;
+}
+.material-icons {
+    font-size: 40px;
+}
+
+#temp {
+    padding-top: 1%;
+    font-size: 14px;
+}
+
+.set {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 25px;
+    font-weight: 300;
+}
+
+.btn {
+    background-color: rgb(6, 62, 38);
+    color: white;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+}
+
+.btn:hover {
+    opacity: 1;
+}
+
+/* .col {
+    margin-left: 38px;
+    width: auto;
+} */
+
+.text-danger {
+    padding: 0px;
+}
+
+.text-success {
+    padding: 0px;
+}
+
+/* .alert {
+    padding: 5px;
+    margin: 10px;
+    margin-top: 10px;
+} */
+
+.modal-header {
+    padding: 0;
+    padding-bottom: 10px;
+    background-color: rgb(236, 55, 55)
+}
+
+.btnn {
+    height: 40px;
+    width: 200px;
+    background-color: rgb(6, 62, 38);
+    color: white;
+    font-size: 18px;
+    border-radius: 8px;
+    border: rounded;
+}
+
+.dasd {
+    margin: 10px;
+    font-size: 50px;
+    margin-left: 225px;
+    color: white;
+    margin-bottom: 20px;
+    border-radius: 20px;
+    border: rounded;
+
+}
+
+.popup {
+    border-radius: 7px;
+    padding: 6px;
+    position: absolute;
+    /* width: 525px; */
+    top: 50%;
+    left: 50%;
+    margin-left: -330px;
+    margin-top: -100px;
+}
+

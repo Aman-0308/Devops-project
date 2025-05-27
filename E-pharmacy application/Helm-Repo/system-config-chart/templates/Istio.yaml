@@ -1,0 +1,90 @@
+---
+# Istio Service Mesh Configuration with Gateway for Epharmacy Application
+# This configuration sets up Istio as a service mesh for the Epharmacy application, including an ingress gateway (Istio control plane, which includes Istiod (the Istio controller), mTLS for secure communication, and path-based routing for various services.
+# It assumes that Istio is already installed in the Kubernetes cluster and the Epharmacy application is deployed in the Epharmacy namespace.
+# This configuration uses Istio's networking and security features to manage traffic and secure communication between services.
+# By default, Istio installs an Ingress Gateway deployment called istio-ingressgateway in the istio-system namespace. This creates a Kubernetes Service of type LoadBalancer.
+---
+
+# 1. Enable mTLS in Epharmacy service (secure communication)
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: auth-peer-authentication
+  namespace: {{ .Values.namespace | default "default" }}
+spec:
+  mtls:
+    mode: STRICT
+---
+# 2. Istio Gateway (Public Exposure for Epharmacy application)
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: {{ .Values.istio.gatewayName | default "epharmacy-gateway" }}
+  namespace: {{ .Values.namespace | default "default" }}
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 443
+        name: https
+        protocol: HTTPS
+      tls:
+        mode: STRICT
+        credentialName: {{ .Values.istio.tlsSecret | default "gateway-secret" }}
+      hosts:
+        - {{ .Values.ingress.host | default "www.epharmacy.com" }}
+---
+# 3. Istio VirtualService (Path-based Routing)
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ .Values.istio.virtualServiceName | default "epharmacy-virtualservice" }}
+  namespace: {{ .Values.namespace | default "default" }}
+spec:
+  hosts:
+    - {{ .Values.ingress.host | default "www.epharmacy.com" }}
+  gateways:
+    - {{ .Values.istio.gatewayName | default "epharmacy-gateway" }}
+  http:
+{{- range .Values.istio.routes }}
+    - match:
+        - uri:
+            prefix: {{ .prefix }}
+      route:
+{{- if .splitting }}
+{{- range .splitting }}
+        - destination:
+            host: {{ .host }}
+            port:
+              number: {{ .port }}
+            subset: {{ .subset }}
+          weight: {{ .weight }}
+{{- end }}
+{{- else }}
+        - destination:
+            host: {{ .host }}
+            port:
+              number: {{ .port }}
+{{- end }}
+{{- end }}
+---
+# 4. Istio Destination Rule for each service
+{{- range .Values.istio.destinationRules }}
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ .name }}
+  namespace: {{ $.Values.namespace | default "default" }}
+spec:
+  host: {{ .host }}
+{{- if .subsets }}
+  subsets:
+{{ toYaml .subsets | indent 4 }}
+{{- end }}
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+{{- end }}

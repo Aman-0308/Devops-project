@@ -1,0 +1,47 @@
+replicaCount: 2
+
+image:
+  repository: your-image
+  tag: tag
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 6200
+
+resources:
+  requests:
+    memory: "1Gi"
+    cpu: "500m"
+  limits:
+    memory: "1.5Gi"
+    cpu: "1Gi"
+
+env:
+  configMap:
+    customerLoginUrl: "http://localhost:6100/epharmacy/customer-api/customer/login"
+    getAllMedicinesUrl: "http://localhost:6200/epharmacy/medicine-api/medicines/pageNumber/"
+    registerCustomerUrl: "http://localhost:6100/epharmacy/customer-api/customer/register"
+    getCustomerCartUrl: "http://localhost:6100/epharmacy/customer-api/customer/cart/getCartDetails"
+
+pvc:
+  claimName: azure-disk-sc
+
+data:
+  tls.crt: <base64-encoded-tls.crt>
+  tls.key: <base64-encoded-tls.key>
+
+metric:
+  name: Http_requests per minute
+  target:
+    type: AverageValue
+    averageValue: "10000"  # Adjust this value based on your application's needs
+
+resourcePolicy:
+  minAllowed:
+    cpu: 250m
+    memory: 128Mi
+  maxAllowed:
+    cpu: 1Gi
+    memory: 1.5Gi

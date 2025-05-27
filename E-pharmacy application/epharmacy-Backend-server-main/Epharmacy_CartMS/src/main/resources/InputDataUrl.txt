@@ -1,0 +1,6 @@
+# URLs for Cart Service
+ADD_MEDICINE_TO_CART_URL=http://localhost:6300/epharmacy/cart-api/cart/add-medicine/{medicineId}/customer/{customerId}
+GET_MEDICINES_FROM_CART_URL=http://localhost:6300/epharmacy/cart-api/cart/medicines/customer/{customerId}
+UPDATE_MEDICINE_QUANTITY_URL=http://localhost:6300/epharmacy/cart-api/cart/update-quantity/medicine/{medicineId}/customer/{customerId}
+DELETE_MEDICINE_FROM_CART_URL=http://localhost:6300/epharmacy/cart-api/cart/delete-medicine/{medicineId}/customer/{customerId}
+DELETE_ALL_MEDICINES_FROM_CART_URL=http://localhost:6300/epharmacy/cart-api/cart/delete-medicines/customer/{customerId}
