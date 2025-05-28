@@ -70,11 +70,11 @@ GO
 
 -- Insert data into CUSTOMER
 INSERT INTO CUSTOMER (CUSTOMER_NAME, CUSTOMER_EMAIL_ID, CONTACT_NUMBER, GENDER, DATE_OF_BIRTH, PASSWORD) VALUES 
-('JOHN', 'john@infosys.com', '8875632142', 'Male', '1999-09-09', '0f4dd6c67bc8c827a2b181bc763f9ab96166d8f50840fe1ae0bbc0e77464da2c'),
-('STEVE', 'steve@infosys.com', '9880253413', 'Male', '1998-09-02', '97661249431ccedba1711b78fb58eceb2c03054a07a7b684ad53048691b34435'),
-('HARSHAL', 'harshal@infosys.com', '8408871600', 'Male', '2000-09-09', '6d3d2d5f46ba476bf88b1775b9b3b8ec9ae42370a977e49ff908e1a1deb93ddc'),
-('SHAHRUKH', 'shah@infosys.com', '9548742258', 'Male', '2001-02-01', 'ae55f0d96478738c466f9ade2cd52cbddc08e49777fdefd702a30c872287504a'),
-('ROSE', 'rose@infosys.com', '9476888203', 'Female', '1999-12-24', '05939a21ed3550987916ded0eded53883d74785e2ad1794a5f570c58d7c6132e');
+('JOHN', 'john@abc.com', '8875632142', 'Male', '1999-09-09', '0f4dd6c67bc8c827a2b181bc763f9ab96166d8f50840fe1ae0bbc0e77464da2c'),
+('STEVE', 'steve@abc.com', '9880253413', 'Male', '1998-09-02', '97661249431ccedba1711b78fb58eceb2c03054a07a7b684ad53048691b34435'),
+('HARSHAL', 'harshal@abc.com', '8408871600', 'Male', '2000-09-09', '6d3d2d5f46ba476bf88b1775b9b3b8ec9ae42370a977e49ff908e1a1deb93ddc'),
+('SHAHRUKH', 'shah@abc.com', '9548742258', 'Male', '2001-02-01', 'ae55f0d96478738c466f9ade2cd52cbddc08e49777fdefd702a30c872287504a'),
+('ROSE', 'rose@abc.com', '9476888203', 'Female', '1999-12-24', '05939a21ed3550987916ded0eded53883d74785e2ad1794a5f570c58d7c6132e');
 GO
 
 -- Insert data into CUSTOMER_ADDRESS
