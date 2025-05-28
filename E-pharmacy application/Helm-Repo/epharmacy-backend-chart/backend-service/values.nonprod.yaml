@@ -1,0 +1,61 @@
+global:
+  namespace: epharmacy-staging
+  version: v1-staging
+
+replicaCount: 1
+
+service:
+  type: ClusterIP
+
+serviceAccountName: default
+
+services:
+  cartService:
+    image: cart-service:v1
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "1Gi"
+        cpu: "1"
+
+  customerService:
+    image: customer-service:v1
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "1Gi"
+        cpu: "1"
+
+  medicineService:
+    image: medicine-service:v1
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "1Gi"
+        cpu: "1"
+
+  orderService:
+    image: order-service:v1
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "1Gi"
+        cpu: "1"
+
+  paymentService:
+    image: payment-service:v1
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "1Gi"
+        cpu: "1"

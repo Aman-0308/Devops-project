@@ -1,0 +1,19 @@
+global:
+  namespace: epharmacy-staging
+  version: v1-staging
+
+replicaCount: 1
+
+image:
+  repository: frontend-service-staging
+  tag: v1-staging
+  pullPolicy: IfNotPresent
+
+
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "1Gi"
+    cpu: "500m"

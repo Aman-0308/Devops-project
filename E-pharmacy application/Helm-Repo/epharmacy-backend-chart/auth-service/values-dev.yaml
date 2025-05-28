@@ -1,0 +1,79 @@
+global:
+  namespace: epharmacy-dev
+  version: v1-dev
+
+replicaCount: 1
+
+image:
+  pullPolicy: IfNotPresent
+
+services:
+  authValidation:
+    image: auth-validation:v1-dev
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "100m"
+      limits:
+        memory: "512Mi"
+        cpu: "250m"
+
+  credentialsValidation:
+    image: auth-credentials-validation:v1-dev
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"
+
+  entitlementValidation:
+    image: auth-entitlement-validation:v1-dev
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"
+
+  deviceValidation:
+    image: auth-device-validation:v1-dev
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "200m"
+      limits:
+        memory: "512Mi"
+        cpu: "300m"
+
+  sessionValidation:
+    image: auth-session-validation:v1-dev
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"
+
+  rsaValidation:
+    image: auth-rsa:v1-dev
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "100m"
+      limits:
+        memory: "256Mi"
+        cpu: "200m"
+
+  accessValidation:
+    image: auth-access:v1-dev
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"

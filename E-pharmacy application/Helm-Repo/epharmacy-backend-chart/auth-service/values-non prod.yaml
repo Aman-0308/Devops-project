@@ -1,0 +1,79 @@
+global:
+  namespace: epharmacy-staging
+  version: v1-staging
+
+replicaCount: 2
+
+image:
+  pullPolicy: IfNotPresent
+
+services:
+  authValidation:
+    image: auth-validation:v1-staging
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"
+
+  credentialsValidation:
+    image: auth-credentials-validation:v1-staging
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+
+  entitlementValidation:
+    image: auth-entitlement-validation:v1-staging
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+
+  deviceValidation:
+    image: auth-device-validation:v1-staging
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "300m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"
+
+  sessionValidation:
+    image: auth-session-validation:v1-staging
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "400m"
+      limits:
+        memory: "1.5Gi"
+        cpu: "800m"
+
+  rsaValidation:
+    image: auth-rsa:v1-staging
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "200m"
+      limits:
+        memory: "512Mi"
+        cpu: "400m"
+
+  accessValidation:
+    image: auth-access:v1-staging
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "1"

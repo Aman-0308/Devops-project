@@ -1,0 +1,19 @@
+global:
+  namespace: epharmacy-prod
+  version: v1-prod
+
+replicaCount: 1
+
+image:
+  repository: frontend-service-prod
+  tag: v1-prod
+  pullPolicy: always
+
+
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "1Gi"
+    cpu: "500m"

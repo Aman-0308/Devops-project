@@ -1,0 +1,79 @@
+global:
+  namespace: epharmacy-prod
+  version: v1
+
+replicaCount: 3
+
+image:
+  pullPolicy: Always
+
+services:
+  authValidation:
+    image: auth-validation:v1
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+
+  credentialsValidation:
+    image: auth-credentials-validation:v1
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "1"
+      limits:
+        memory: "3Gi"
+        cpu: "2"
+
+  entitlementValidation:
+    image: auth-entitlement-validation:v1
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "1"
+      limits:
+        memory: "3Gi"
+        cpu: "2"
+
+  deviceValidation:
+    image: auth-device-validation:v1
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+
+  sessionValidation:
+    image: auth-session-validation:v1
+    resources:
+      requests:
+        memory: "1.5Gi"
+        cpu: "750m"
+      limits:
+        memory: "2Gi"
+        cpu: "1.5"
+
+  rsaValidation:
+    image: auth-rsa:v1
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"
+
+  accessValidation:
+    image: auth-access:v1
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "1"
+      limits:
+        memory: "3Gi"
+        cpu: "2"

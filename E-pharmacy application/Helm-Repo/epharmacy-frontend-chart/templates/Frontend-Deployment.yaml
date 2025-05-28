@@ -94,10 +94,10 @@ metadata:
   name: frontend-configmap
   namespace: Epharmacy
 data:
-  customerLoginUrl: {{ .Values.env.configMap.customerLoginUrl | quote }}
-  getAllMedicinesUrl: {{ .Values.env.configMap.getAllMedicinesUrl | quote }}
-  registerCustomerUrl: {{ .Values.env.configMap.registerCustomerUrl | quote }}
-  getCustomerCartUrl: {{ .Values.env.configMap.getCustomerCartUrl | quote }}
+  customerLoginUrl: "http://localhost:6100/epharmacy/customer-api/customer/login"
+  getAllMedicinesUrl: "http://localhost:6200/epharmacy/medicine-api/medicines/pageNumber/"
+  registerCustomerUrl: "http://localhost:6100/epharmacy/customer-api/customer/register"
+  getCustomerCartUrl: "http://localhost:6100/epharmacy/customer-api/customer/cart/getCartDetails"
 
 ---
 apiVersion: v1
@@ -106,5 +106,7 @@ metadata:
   name: frontend-secret
   namespace: Epharmacy
 type: Opaque
-data: {} 
+data: 
+  tls.crt: <base64-encoded-tls.crt>
+  tls.key: <base64-encoded-tls.key>
 ---       

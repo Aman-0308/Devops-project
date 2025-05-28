@@ -5,89 +5,210 @@ global:
 
 replicaCount: 1
 
-name:
-  authValidation: auth-validation
-  credentialsValidation: auth-credentials-validation
-  entitlementValidation: auth-entitlement-validation
-  deviceValidation: auth-device-validation
-  sessionValidation: auth-session-validation
-  rsaValidation: auth-rsa
-  accessValidation: auth-access
-
 image:
   pullPolicy: IfNotPresent
-  authValidation: auth-validation:v1
-  credentialsValidation: auth-credentials-validation:v1
-  entitlementValidation: auth-entitlement-validation:v1
-  deviceValidation: auth-device-validation:v1
-  sessionValidation: auth-session-validation:v1
-  rsaValidation: auth-rsa:v1
-  accessValidation: auth-access:v1
-
 
 service:
   type: ClusterIP
 
-containerPort: 1100
+services:
+  authValidation:
+    name: auth-validation
+    image: auth-validation:v1
+    containerPort: 1100
+    serviceAccountName: backend-sa
+    securityContext:
+      runAsUser: 1000
+    tolerations:
+      - key: "nodeType"
+        operator: "Equal"
+        value: "Node01"
+        effect: "NoSchedule"
+    nodeSelector:
+      nodeType: Node01
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"
+    readinessProbe:
+      initialDelaySeconds: 120
+      periodSeconds: 20
+    livenessProbe:
+      initialDelaySeconds: 200
+      periodSeconds: 10
 
-resources:
-  requests:
-    memory: "1Gi"
-    cpu: "500m"
-  limits:
-    memory: "1Gi"
-    cpu: "1"
+  credentialsValidation:
+    name: auth-credentials-validation
+    image: auth-credentials-validation:v1
+    containerPort: 1300
+    serviceAccountName: backend-sa
+    securityContext:
+      runAsUser: 1000
+    tolerations:
+      - key: "nodeType"
+        operator: "Equal"
+        value: "Node01"
+        effect: "NoSchedule"
+    nodeSelector:
+      nodeType: Node01
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+    readinessProbe:
+      initialDelaySeconds: 130
+      periodSeconds: 25
+    livenessProbe:
+      initialDelaySeconds: 210
+      periodSeconds: 15
 
+  entitlementValidation:
+    name: auth-entitlement-validation
+    image: auth-entitlement-validation:v1
+    containerPort: 1400
+    serviceAccountName: backend-sa
+    securityContext:
+      runAsUser: 1000
+    tolerations:
+      - key: "nodeType"
+        operator: "Equal"
+        value: "Node01"
+        effect: "NoSchedule"
+    nodeSelector:
+      nodeType: Node01
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "1Gi"
+        cpu: "1"
+    readinessProbe:
+      initialDelaySeconds: 110
+      periodSeconds: 20
+    livenessProbe:
+      initialDelaySeconds: 190
+      periodSeconds: 10
+
+  deviceValidation:
+    name: auth-device-validation
+    image: auth-device-validation:v1
+    containerPort: 1500
+    serviceAccountName: backend-sa
+    securityContext:
+      runAsUser: 1000
+    tolerations:
+      - key: "nodeType"
+        operator: "Equal"
+        value: "Node01"
+        effect: "NoSchedule"
+    nodeSelector:
+      nodeType: Node01
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "300m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"
+    readinessProbe:
+      initialDelaySeconds: 125
+      periodSeconds: 20
+    livenessProbe:
+      initialDelaySeconds: 195
+      periodSeconds: 10
+
+  sessionValidation:
+    name: auth-session-validation
+    image: auth-session-validation:v1
+    containerPort: 1600
+    serviceAccountName: backend-sa
+    securityContext:
+      runAsUser: 1000
+    tolerations:
+      - key: "nodeType"
+        operator: "Equal"
+        value: "Node01"
+        effect: "NoSchedule"
+    nodeSelector:
+      nodeType: Node01
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "400m"
+      limits:
+        memory: "1.5Gi"
+        cpu: "800m"
+    readinessProbe:
+      initialDelaySeconds: 130
+      periodSeconds: 20
+    livenessProbe:
+      initialDelaySeconds: 210
+      periodSeconds: 10
+
+  rsaValidation:
+    name: auth-rsa
+    image: auth-rsa:v1
+    containerPort: 1700
+    serviceAccountName: backend-sa
+    securityContext:
+      runAsUser: 1000
+    tolerations:
+      - key: "nodeType"
+        operator: "Equal"
+        value: "Node01"
+        effect: "NoSchedule"
+    nodeSelector:
+      nodeType: Node01
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "200m"
+      limits:
+        memory: "512Mi"
+        cpu: "400m"
+    readinessProbe:
+      initialDelaySeconds: 140
+      periodSeconds: 25
+    livenessProbe:
+      initialDelaySeconds: 220
+      periodSeconds: 10
+
+  accessValidation:
+    name: auth-access
+    image: auth-access:v1
+    containerPort: 1200
+    serviceAccountName: 
+    securityContext:
+      runAsUser: 1000
+    tolerations:
+      - key: "nodeType"
+        operator: "Equal"
+        value: "Node01"
+        effect: "NoSchedule"
+    nodeSelector:
+      nodeType: Node01
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+    readinessProbe:
+      initialDelaySeconds: 120
+      periodSeconds: 20
+    livenessProbe:
+      initialDelaySeconds: 200
+      periodSeconds: 10
 env:
-  authConfigMap: auth-config
-  backendConfigMap: backend-config
-  authSecret: auth-secret
-  backendSecret: backend-secret
-
-serviceAccountName: default
-
-securityContext:
-  runAsUser: 1000
-
-tolerations:
-  nodeTypeValue: Node01
-
-nodeSelector:
-  nodeType: Node01
-
-readinessProbe:
-  initialDelaySeconds: 120
-  periodSeconds: 20
-
-livenessProbe:
-  initialDelaySeconds: 200
-  periodSeconds: 10
-
-configmap:
-  serverContextPath: "/epharmacy"
-  authBaseUrl: "http://auth-service:1100/epharmacy/auth-api"
-  successRedirectUrl: "http://auth-service:1100/epharmacy/auth-api/auth"
-  authApi: "/auth-api"
-  authAccessApi: "/auth-api/access"
-  authAccessBaseUrl: "http://auth-access:1200/epharmacy/auth-api/access"
-  authCredentialsValidationApi: "/auth-api/credentialsValidation"
-  authCredentialsValidationBaseUrl: "http://auth-credentialsValidation:1300/auth-api/credentialsValidation"
-  authEntitlementValidationApi: "/auth-api/credentialsValidation"
-  authEntitlementValidationBaseUrl: "http://auth-entitlementValidation:1400/auth-api/credentialsValidation"
-  authDeviceValidationApi: "/auth-api/credentialsValidation"
-  authDeviceValidationBaseUrl: "http://auth-deviceValidation:1500/epharmacy/auth-api/credentialsValidation"
-  authSessionValidationApi: "/auth-api/credentialsValidation"
-  authSessionValidationBaseUrl: "http://auth-sessionValidation:1600/epharmacy/auth-api/credentialsValidation"
-  authVendorValidationApi: "/auth-api/credentialsValidation"
-  authVendorValidationBaseUrl: "http://auth-vendorValidation:1700/epharmacy/auth-api/credentialsValidation"
-
-secret:
-  REDIS_URL: <base64-encoded-redis-url>
-  REDIS_HOST: <base64-encoded-redis-host>
-  REDIS_PORT: <base64-encoded-redis-port>
-  REDIS_USERNAME: <base64-encoded-redis-username>
-  REDIS_PASSWORD: <base64-encoded-redis-password>
-  JWT_KEY: <base64-encoded-jwt-key>
-  JWT_KEY1: <base64-encoded-jwt-key1>
-  LDAP_USERNAME: "admin.example.com"
-  LDAP_PASSWORD: "Rahul@123"
+  authConfigMap: auth-config-prod
+  backendConfigMap: backend-config-prod
+  authSecret: auth-secret-prod
+  backendSecret: backend-secret-prod
